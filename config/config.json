@@ -252,5 +252,11 @@
       "embed_value": ":flag_us: A new dig has been posted! Get digging!\n:flag_kr: \uc0c8\ub85c\uc6b4 \ubc1c\uad74\uc774 \uac8c\uc2dc\ub418\uc5c8\uc2b5\ub2c8\ub2e4! \ubc1c\uad74\uc744 \uc2dc\uc791\ud558\uc138\uc694!",
       "embed_color": "0xFF0000"
     }
+  },
+  "adb": {
+    "ip": "",
+    "port": -1,
+    "binary_path": "adb",
+    "enforce_connection": false
   }
 }

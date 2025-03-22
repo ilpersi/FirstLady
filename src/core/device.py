@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 from .logging import app_logger
 from pathlib import Path
 import shutil
+from src.core.config import CONFIG
 
 def take_screenshot(device_id: str) -> bool:
     """Take screenshot and pull to local tmp directory"""
@@ -12,14 +13,14 @@ def take_screenshot(device_id: str) -> bool:
         ensure_dir("tmp")
         
         # Take screenshot on device
-        cmd = f"adb -s {device_id} shell screencap -p /sdcard/screen.png"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell screencap -p /sdcard/screen.png"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             app_logger.error(f"Failed to take screenshot: {result.stderr}")
             return False
             
         # Pull screenshot to local tmp directory
-        cmd = f"adb -s {device_id} pull /sdcard/screen.png tmp/screen.png"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} pull /sdcard/screen.png tmp/screen.png"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             app_logger.error(f"Failed to pull screenshot: {result.stderr}")
@@ -36,7 +37,7 @@ def take_screenshot(device_id: str) -> bool:
 def get_screen_size(device_id: str) -> Tuple[int, int]:
     """Get screen size from device"""
     try:
-        cmd = f"adb -s {device_id} shell wm size"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell wm size"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             app_logger.error(f"Failed to get screen size: {result.stderr}")
@@ -53,7 +54,7 @@ def get_screen_size(device_id: str) -> Tuple[int, int]:
 def cleanup_device_screenshots(device_id: str) -> None:
     """Clean up screenshots from device"""
     try:
-        cmd = f"adb -s {device_id} shell rm -f /sdcard/screen*.png"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell rm -f /sdcard/screen*.png"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             app_logger.debug("Cleaned up device screenshots")

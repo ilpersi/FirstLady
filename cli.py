@@ -3,16 +3,14 @@
 import sys
 import argparse
 import traceback
-import time
 import json
-from pathlib import Path
 import signal
 from src.core.logging import setup_logging, app_logger
-from src.core.device import cleanup_temp_files, cleanup_device_screenshots, ensure_dir
 from src.core.adb import get_connected_device
 from src.automation.automation import MainAutomation
 from src.core.cleanup import CleanupManager
 from src.automation.handler_factory import HandlerFactory
+
 
 def get_routine_config():
     try:

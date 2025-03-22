@@ -2,19 +2,21 @@
 
 import subprocess
 from typing import List, Optional
+
+from .config import CONFIG
 from .logging import app_logger
 import re
 import time
 import socket
-import telnetlib
 import os
 import traceback
+
 
 def get_device_list() -> List[str]:
     """Get list of connected devices"""
     try:
         # Try to run ADB directly first
-        cmd = ["adb", "devices"]
+        cmd = [CONFIG.adb["binary_path"], "devices"]
         try:
             result = subprocess.run(
                 cmd,
@@ -67,19 +69,19 @@ def get_device_list() -> List[str]:
 def launch_package(device_id: str, package_name: str):
     """Launch an app package"""
     subprocess.run(
-        ['adb', '-s', device_id, 'shell', 'monkey', '-p', package_name, '-c', 'android.intent.category.LAUNCHER', '1'],
+        [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'monkey', '-p', package_name, '-c', 'android.intent.category.LAUNCHER', '1'],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
 
 def force_stop_package(device_id: str, package_name: str):
     """Force stop an app package"""
-    subprocess.run(['adb', '-s', device_id, 'shell', 'am', 'force-stop', package_name])
+    subprocess.run([CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'am', 'force-stop', package_name])
 
 def press_back(device_id: str) -> bool:
     """Press back button"""
     try:
-        cmd = f"adb -s {device_id} shell input keyevent 4"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input keyevent 4"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -90,7 +92,7 @@ def press_back(device_id: str) -> bool:
 def tap_screen(device_id: str, x: int, y: int) -> bool:
     """Tap screen at coordinates"""
     try:
-        cmd = f"adb -s {device_id} shell input tap {x} {y}"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input tap {x} {y}"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -101,7 +103,7 @@ def tap_screen(device_id: str, x: int, y: int) -> bool:
 def swipe_screen(device_id: str, start_x: int, start_y: int, end_x: int, end_y: int, duration: int = 300) -> bool:
     """Swipe screen from start to end coordinates"""
     try:
-        cmd = f"adb -s {device_id} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
+        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -125,7 +127,7 @@ def get_current_running_app(device_id):
     """
     try:
         result = subprocess.run(
-            ['adb', '-s', device_id, 'shell', 'dumpsys', 'window', 'windows'],
+            [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'dumpsys', 'window', 'windows'],
             capture_output=True,
             text=True,
             check=True
@@ -150,7 +152,7 @@ def long_press_screen(device_id: str, x: int, y: int, duration: int) -> bool:
         duration: Press duration in milliseconds
     """
     try:
-        cmd = f'adb -s {device_id} shell input swipe {x} {y} {x} {y} {duration}'
+        cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell input swipe {x} {y} {x} {y} {duration}'
         subprocess.run(cmd, shell=True, check=True)
         return True
     except subprocess.CalledProcessError:
@@ -161,7 +163,7 @@ def get_screen_size(device_id: str) -> tuple[int, int]:
     """Get device screen size"""
     try:
         result = subprocess.run(
-            ['adb', '-s', device_id, 'shell', 'wm', 'size'], 
+            [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'wm', 'size'],
             capture_output=True, 
             text=True
         )
@@ -203,7 +205,7 @@ def simulate_shake(device_id: str, duration_ms: int = 1000) -> bool:
             
             for values in pattern:
                 # Use the full adb shell command instead of emu
-                cmd = f'adb -s {device_id} shell "setprop debug.sensors.accelerometer.x {values.split(":")[0]};' \
+                cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell "setprop debug.sensors.accelerometer.x {values.split(":")[0]};' \
                       f'setprop debug.sensors.accelerometer.y {values.split(":")[1]};' \
                       f'setprop debug.sensors.accelerometer.z {values.split(":")[2]}"'
                 app_logger.debug(f"Executing: {cmd}")
@@ -211,7 +213,7 @@ def simulate_shake(device_id: str, duration_ms: int = 1000) -> bool:
                 time.sleep(0.1)
                 
             # Reset to normal
-            cmd = f'adb -s {device_id} shell "setprop debug.sensors.accelerometer.x 0;' \
+            cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell "setprop debug.sensors.accelerometer.x 0;' \
                   f'setprop debug.sensors.accelerometer.y 0;' \
                   f'setprop debug.sensors.accelerometer.z 9.81"'
             subprocess.run(cmd, shell=True)
