@@ -254,7 +254,7 @@
     }
   },
   "adb": {
-    "ip": "",
+    "host": "",
     "port": -1,
     "binary_path": "adb",
     "enforce_connection": false

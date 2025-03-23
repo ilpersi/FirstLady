@@ -14,30 +14,35 @@ import traceback
 
 def get_device_list() -> List[str]:
     """Get list of connected devices"""
+
+    cmd = [CONFIG.adb["binary_path"], "version"]
     try:
-        # Try to run ADB directly first
-        cmd = [CONFIG.adb["binary_path"], "devices"]
+
+        # We initially check the adb version to verify that everything is working
         try:
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 check=True,
-                shell=True  # Required for Windows compatibility
+                shell=True
             )
-        except FileNotFoundError:
+
+        except (FileNotFoundError, subprocess.CalledProcessError):
             app_logger.error("ADB not found in PATH. Checking common Android SDK locations...")
+
             # Common SDK locations
             sdk_locations = [
                 os.path.expanduser("~/AppData/Local/Android/Sdk/platform-tools/adb.exe"),
                 "C:/Program Files/Android/platform-tools/adb.exe",
                 os.path.expanduser("~/Android/Sdk/platform-tools/adb.exe")
             ]
-            
+
             for adb_path in sdk_locations:
                 if os.path.exists(adb_path):
                     app_logger.info(f"Found ADB at: {adb_path}")
                     cmd[0] = adb_path
+                    CONFIG.adb["binary_path"] = adb_path
                     result = subprocess.run(
                         cmd,
                         capture_output=True,
@@ -47,8 +52,41 @@ def get_device_list() -> List[str]:
                     )
                     break
             else:
-                app_logger.error("ADB not found in common locations. Please ensure Android SDK platform-tools is installed")
+                app_logger.error(
+                    "ADB not found in common locations. Please ensure Android SDK platform-tools is installed")
                 return []
+
+        lines = result.stdout.strip()
+        version_re = re.compile("Version ([^\r\n]+)")
+        version_match = version_re.search(lines)
+        if version_match:
+            adb_version = version_match.group(1)
+            app_logger.debug(f"Found adb version: {adb_version}")
+        else:
+            app_logger.debug(f"Unknown adb version found:\n{lines}")
+
+        if CONFIG.adb["enforce_connection"]:
+            cmd = [CONFIG.adb["binary_path"], "connect", f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"]
+            subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=True,
+                shell=True  # Required for Windows compatibility
+            )
+
+        cmd = [CONFIG.adb["binary_path"], "devices"]
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=True,
+            shell=True  # Required for Windows compatibility
+        )
+
+        target_device = ""
+        if CONFIG.adb['host'] and CONFIG.adb['port']:
+            target_device = f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"
 
         # Parse output and get device IDs
         lines = result.stdout.strip().split('\n')[1:]  # Skip first line
@@ -56,9 +94,15 @@ def get_device_list() -> List[str]:
         for line in lines:
             if line.strip():
                 device_id = line.split()[0]
-                devices.append(device_id)
                 app_logger.debug(f"Found device: {device_id}")
-        
+
+                if len(target_device) > 0:
+                    if target_device in device_id:
+                        devices.append(device_id)
+                        break
+                else:
+                    devices.append(device_id)
+
         return devices
             
     except Exception as e:
@@ -113,6 +157,7 @@ def swipe_screen(device_id: str, start_x: int, start_y: int, end_x: int, end_y: 
 
 def get_connected_device() -> Optional[str]:
     """Get the first connected device ID"""
+
     devices = get_device_list()
     if not devices:
         app_logger.error("No devices connected")
