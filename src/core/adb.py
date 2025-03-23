@@ -66,14 +66,15 @@ def get_device_list() -> List[str]:
             app_logger.debug(f"Unknown adb version found:\n{lines}")
 
         if CONFIG.adb["enforce_connection"]:
-            cmd = [CONFIG.adb["binary_path"], "connect", f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"]
-            subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=True,
-                shell=True  # Required for Windows compatibility
-            )
+            if CONFIG.adb['host'] and CONFIG.adb['port'] and CONFIG.adb['port'] > 0:
+                cmd = [CONFIG.adb["binary_path"], "connect", f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"]
+                subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    shell=True  # Required for Windows compatibility
+                )
 
         cmd = [CONFIG.adb["binary_path"], "devices"]
         result = subprocess.run(
