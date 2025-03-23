@@ -54,7 +54,7 @@ class ConfigManager:
     @property
     def adb(self) -> Dict[str, Any]:
         return self._config.get('adb', {
-            "ip": "",
+            "host": "",
             "port": -1,
             "binary_path": "adb",
             "enforce_connection": False
