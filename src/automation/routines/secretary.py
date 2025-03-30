@@ -199,6 +199,8 @@ class SecretaryRoutine(TimeCheckRoutine):
                         languages='eng',
                         img=screenshot
                     )
+
+                    app_logger.debug(f"Found alliance is {alliance_text}")
                     
                     if len(CONTROL_LIST['whitelist']['alliance']) > 0:
 
