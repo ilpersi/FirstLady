@@ -82,21 +82,7 @@
   },
   "control_list": {
     "whitelist": {
-      "alliance": [
-        "Brn",
-        "sTAR",
-        "twr",
-        "UbRg",
-        "Trol",
-        "trol",
-        "wxp",
-        "NzC",
-        "krw",
-        "FZL",
-        "rhw",
-        "s8UP",
-        "ssUP"
-      ]
+      "alliance": []
     },
     "blacklist": {
       "alliance": []
