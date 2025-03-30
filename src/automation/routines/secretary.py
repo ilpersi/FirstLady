@@ -204,6 +204,13 @@ class SecretaryRoutine(TimeCheckRoutine):
                     )
                     
                     if len(CONTROL_LIST['whitelist']['alliance']) > 0:
+                        alliance_text, original_text = extract_text_from_region(
+                            self.device_id,
+                            alliance_region,
+                            languages='eng',
+                            img=screenshot
+                        )
+
                         if alliance_text in CONTROL_LIST['whitelist']['alliance']:
                             humanized_tap(self.device_id, topmost_accept[0], topmost_accept[1])
                             app_logger.debug(f"Tapping accept at coordinates: ({topmost_accept[0]}, {topmost_accept[1]})")
