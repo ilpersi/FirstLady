@@ -40,7 +40,7 @@ def get_text_regions(
     
     # Calculate initial search region aligned with accept button
     x_offset = int(width * 0.48)
-    y_offset = int(height * 0.015)  # 1.5% vertical search area
+    y_offset = int(height * 0.026)  # 1.5% vertical search area
     
     # Get template size to ensure minimum search region
     template, template_config = _load_template('left_bracket')
@@ -192,7 +192,7 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
         config = (
             '--psm 7 '  # Single line mode
             '--oem 1 '  # LSTM only
-            f'-c tessedit_char_whitelist={ALLIANCE_CHARS}[] '
+            # f'-c tessedit_char_whitelist={ALLIANCE_CHARS}[] '
             '-c tessedit_write_images=1 '
             '-c textord_min_linesize=2 '
             '-c edges_max_children_per_outline=40'
@@ -204,7 +204,7 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
         text = text.replace('—', '').replace('–', '').strip()
         
         # Try to extract text between brackets first
-        bracket_match = re.search(r'[\[|\(](.*?)[\]|\)]', text)
+        bracket_match = re.search(r'[\[|(]{0,1}([^]|)]+)[]|)]{0,1}', text)
         if bracket_match:
             return bracket_match.group(1), original_text
             
