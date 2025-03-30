@@ -192,24 +192,16 @@ class SecretaryRoutine(TimeCheckRoutine):
                         self.device_id,
                         existing_screenshot=current_screenshot
                     )
-                    
-                    if screenshot is None:
-                        continue
 
                     alliance_text, original_text = extract_text_from_region(
-                        self.device_id, 
-                        alliance_region, 
-                        languages='eng', 
+                        self.device_id,
+                        alliance_region,
+                        languages='eng',
                         img=screenshot
                     )
                     
                     if len(CONTROL_LIST['whitelist']['alliance']) > 0:
-                        alliance_text, original_text = extract_text_from_region(
-                            self.device_id,
-                            alliance_region,
-                            languages='eng',
-                            img=screenshot
-                        )
+
 
                         if alliance_text in CONTROL_LIST['whitelist']['alliance']:
                             humanized_tap(self.device_id, topmost_accept[0], topmost_accept[1])
