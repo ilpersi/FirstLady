@@ -32,9 +32,9 @@
     },
     "swipe": {
       "start_x": "50%",
-      "start_y": "30%",
+      "start_y": "40%",
       "end_x": "50%",
-      "end_y": "80%"
+      "end_y": "90%"
     }
   },
   "timings": {
