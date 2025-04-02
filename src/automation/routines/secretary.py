@@ -155,7 +155,7 @@ class SecretaryRoutine(TimeCheckRoutine):
 
             full_list = find_template(self.device_id, "full_list")
             if full_list:
-                app_logger.error(f"Auto-appointment list for {name} is already 50/50")
+                app_logger.info(f"Auto-appointment list for {name} is already 50/50")
                 if not self.exit_to_secretary_menu():
                     app_logger.error("Failed to exit to secretary menu")
                     return False
