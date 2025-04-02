@@ -216,6 +216,9 @@
     "has_applicant": {
       "path": "templates/secretary/hasApplicant.png",
       "threshold": 0.45
+    },"full_list": {
+      "path": "templates/secretary/full_list.png",
+      "threshold": 0.95
     },
     "alliance_gifts": {
       "path": "templates/alliance/gifts.png",
