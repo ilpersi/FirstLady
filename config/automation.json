@@ -6,15 +6,15 @@
       },
       "donate": {
         "handler": "src.automation.routines.allianceDonate.AllianceDonateRoutine",
-        "interval": 22000
+        "interval": null
       },
       "help": {
         "handler": "src.automation.routines.help.HelpRoutine",
-        "interval": 5
+        "interval": null
       },
       "dig": {
         "handler": "src.automation.routines.checkForDigs.CheckForDigsRoutine",
-        "interval": 5
+        "interval": null
       },
       "secretary": {
         "handler": "src.automation.routines.secretary.SecretaryRoutine",
@@ -22,15 +22,15 @@
       },
       "mapExchange": {
         "handler": "src.automation.routines.mapExchange.MapExchangeRoutine",
-        "interval": 300
+        "interval": null
       },
       "gifts": {
         "handler": "src.automation.routines.allianceGifts.AllianceGiftsRoutine",
-        "interval": 5000
+        "interval": null
       },
       "collect_resources": {
         "handler": "src.automation.routines.collectResources.CollectResourcesRoutine",
-        "interval": 10000
+        "interval": null
       }
     },
     "scheduled_events": {
