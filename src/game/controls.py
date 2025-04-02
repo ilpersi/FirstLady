@@ -14,7 +14,7 @@ def human_delay(delay: float):
 
 def handle_swipes(device_id: str, direction: str = "up", num_swipes: int = 8) -> None:
     """Handle scrolling with swipes"""
-    width, height = get_screen_size(device_id)
+    height, width = get_screen_size(device_id)
     
     swipe_cfg = CONFIG['ui_elements']['swipe']
     variance_pct = float(CONFIG['randomization']['swipe_variance']['position'].strip('%')) / 100
