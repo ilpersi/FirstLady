@@ -1,7 +1,7 @@
 from src.automation.routines import TimeCheckRoutine
 from src.core.adb import press_back
 from src.core.config import CONFIG
-from src.core.image_processing import find_and_tap_template
+from src.core.image_processing import find_template, find_and_tap_template
 from src.game.controls import human_delay
 
 class AllianceGiftsRoutine(TimeCheckRoutine):
@@ -49,12 +49,18 @@ class AllianceGiftsRoutine(TimeCheckRoutine):
             error_msg="No premium tab found found"
         ):
             return True
-        
-        # Click collect all button
-        find_and_tap_template(
-            self.device_id,
-            "alliance_claim_all",
-            error_msg="No claim all button found"
-        )
+
+        if not find_template(self.device_id, "alliance_claim_all"):
+            while find_and_tap_template(self.device_id, "alliance_claim",
+                                        success_msg="Claimed alliance gift."):
+                human_delay(CONFIG['timings']['menu_animation'])
+
+        else:
+            # Click collect all button
+            find_and_tap_template(
+                self.device_id,
+                "alliance_claim_all",
+                error_msg="No claim all button found"
+            )
         
         return True

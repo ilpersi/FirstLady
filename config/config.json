@@ -228,6 +228,10 @@
       "path": "templates/alliance/claim_all.png",
       "threshold": 0.65
     },
+    "alliance_claim": {
+      "path": "templates/alliance/claim.png",
+      "threshold": 0.80
+    },
     "alliance_gift_premium": {
       "path": "templates/alliance/premium.png",
       "threshold": 0.65
@@ -243,9 +247,19 @@
     }
   },
   "adb": {
-    "host": "",
-    "port": -1,
-    "binary_path": "adb",
-    "enforce_connection": false
+    "host": "127.0.0.1",
+    "port": 5555,
+    "binary_path": "D:\\Android\\SDK\\platform-tools\\adb.exe",
+    "enforce_connection": true
+  },
+  "arms_race": {
+    "order": ["Hero Advancement", "City Building", "Unit Progression", "Tech Research", "Drone Boos"],
+    "title_map": {
+      "security" : ["Unit Progression"],
+      "development" : ["City Building"],
+      "science" : ["Tech Research"],
+      "interior" : ["Unit Progression"],
+      "administrative" : ["City Building", "Tech Research"]
+    }
   }
 }
