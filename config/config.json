@@ -6,7 +6,8 @@
     "restart_cmd": {
       "exe_path": "C:\\Program Files\\BlueStacks_nxt\\HD-Player.exe",
       "args": [
-        "--instance", "Nougat32"
+        "--instance", "Nougat32", "--cmd", "launchApp",
+        "--package","\"com.fun.lastwar.gp\"", "--source", "desktop_shortcut"
       ]
     },
     "start_delay": 300

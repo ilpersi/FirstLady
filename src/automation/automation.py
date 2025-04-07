@@ -374,6 +374,7 @@ def verify_emulator_running() -> bool:
                 if not last_line.lower().startswith(process_name.lower()):
                     restart_cmd = emulator_cfg.get("restart_cmd", False)
                     if restart_cmd:
+                        app_logger.info("Emulator is not running, launching emulator")
 
                         args = [restart_cmd["exe_path"]]
                         args.extend(restart_cmd["args"])
