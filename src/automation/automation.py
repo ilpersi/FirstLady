@@ -8,7 +8,7 @@ from src.automation.routines.routineBase import RoutineBase
 from src.core.config import CONFIG
 from src.core.logging import app_logger, setup_logging
 from src.core.scheduling import update_interval_check, update_schedule
-from src.core.adb import get_current_running_app
+from src.core.adb import get_current_running_app, enforce_connection
 from src.core.device import cleanup_temp_files, cleanup_device_screenshots
 from src.automation.state import AutomationState
 from src.automation.handler_factory import HandlerFactory
@@ -274,6 +274,9 @@ class MainAutomation:
             notification_interval = 3600  # 1 hour in seconds
             
             while True:
+                verify_emulator_running()
+                enforce_connection()
+
                 # Check if game is running first
                 current_app = get_current_running_app(self.device_id)
                 if current_app == CONFIG['package_name']:
@@ -332,19 +335,22 @@ class MainAutomation:
         app_logger.info("Resetting game state...")
         retry_count = 0
         base_sleep = CONFIG['timings']['launch_wait']
-        
+
+
         while retry_count < CONFIG['max_home_attempts']:
+            verify_emulator_running()
+            enforce_connection()
             # Use exponential backoff with cap
             sleep_time = min(base_sleep * (2 ** retry_count), 600)
             app_logger.info(f"Launching game in {sleep_time} seconds")
             time.sleep(sleep_time)
-            
+
             if launch_game(self.device_id):
                 app_logger.info("Game launched successfully")
                 if navigate_home(self.device_id, force=True):
                     self.game_state["is_home"] = True
                     return True
-                
+
             retry_count += 1
         
         app_logger.error("Failed to reset game after maximum attempts")
@@ -381,7 +387,9 @@ def verify_emulator_running() -> bool:
 
                         subprocess.Popen(args, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                         start_delay = emulator_cfg.get("start_delay", 300)
+                        app_logger.info(f"Emulator launched, sleeping {start_delay} seconds")
                         time.sleep(start_delay)
+                        enforce_connection()
                         result = True
                 else:
                     result = True
