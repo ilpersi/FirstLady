@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
-import time
 import json
+import platform
+import subprocess
+import time
 from pathlib import Path
 from typing import Dict, Any, Optional
 from src.automation.routines.routineBase import RoutineBase
@@ -14,6 +15,7 @@ from src.automation.handler_factory import HandlerFactory
 from src.game.controls import launch_game, navigate_home
 import os
 import asyncio
+
 
 class MainAutomation:
     def __init__(self, device_id: str, debug: bool = False):
@@ -175,6 +177,10 @@ class MainAutomation:
         # Update timers
         self.time_checks = update_interval_check(self.time_checks, time.time())
         self.scheduled_events = update_schedule(self.scheduled_events, time.time())
+
+        # Ensure Android Emulator is running
+        if not verify_emulator_running():
+            return False
 
         # Ensure game is running
         if not self.verify_game_running():
@@ -348,3 +354,38 @@ class MainAutomation:
         """Force a game reset regardless of state"""
         app_logger.info("Forcing game reset...")
         return self.reset_game()
+
+def verify_emulator_running() -> bool:
+    result = False
+
+    emulator_cfg = CONFIG['emulator']
+
+    if emulator_cfg.get("check_running"):
+
+        if platform.system() == "Windows":
+
+            process_name = emulator_cfg.get("process_name", False)
+            if process_name:
+
+                cmd = 'TASKLIST', '/FI', f'imagename eq {process_name}'
+                output = subprocess.check_output(cmd).decode()
+                last_line = output.strip().split('\r\n')[-1]
+
+                if not last_line.lower().startswith(process_name.lower()):
+                    restart_cmd = emulator_cfg.get("restart_cmd", False)
+                    if restart_cmd:
+
+                        args = [restart_cmd["exe_path"]]
+                        args.extend(restart_cmd["args"])
+
+                        subprocess.Popen(args, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        start_delay = emulator_cfg.get("start_delay", 300)
+                        time.sleep(start_delay)
+                        result = True
+                else:
+                    result = True
+        else:
+            # On other operating systems we assume emulator is running fine
+            result = True
+
+    return result

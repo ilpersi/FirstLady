@@ -1,5 +1,16 @@
 {
   "package_name": "com.fun.lastwar.gp",
+  "emulator": {
+    "check_running": true,
+    "process_name": "HD-Player.exe",
+    "restart_cmd": {
+      "exe_path": "C:\\Program Files\\BlueStacks_nxt\\HD-Player.exe",
+      "args": [
+        "--instance", "Nougat32"
+      ]
+    },
+    "start_delay": 300
+  },
   "sleep_multiplier": 1.0,
   "debug_mode": false,
   "max_retries": 3,

@@ -7,7 +7,7 @@ import json
 import signal
 from src.core.logging import setup_logging, app_logger
 from src.core.adb import get_connected_device
-from src.automation.automation import MainAutomation
+from src.automation.automation import MainAutomation, verify_emulator_running
 from src.core.cleanup import CleanupManager
 from src.automation.handler_factory import HandlerFactory
 
@@ -75,6 +75,8 @@ def run_single_routine(device_id: str, routine_name: str) -> bool:
 def main():
     args = parser.parse_args()
     setup_logging(args.debug)
+
+    verify_emulator_running()
     
     device_id = get_connected_device()
     if not device_id:
