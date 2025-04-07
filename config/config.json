@@ -7,7 +7,7 @@
       "exe_path": "C:\\Program Files\\BlueStacks_nxt\\HD-Player.exe",
       "args": [
         "--instance", "Nougat32", "--cmd", "launchApp",
-        "--package","\"com.fun.lastwar.gp\"", "--source", "desktop_shortcut"
+        "--package","com.fun.lastwar.gp", "--source", "desktop_shortcut"
       ]
     },
     "start_delay": 300
@@ -15,7 +15,7 @@
   "sleep_multiplier": 1.0,
   "debug_mode": false,
   "max_retries": 3,
-  "max_home_attempts": 500,
+  "max_home_attempts": 200,
   "retry_delay": 1.0,
   "collect_resources_interval": 300,
   "donate_alliance_interval": null,
@@ -228,7 +228,8 @@
     "has_applicant": {
       "path": "templates/secretary/hasApplicant.png",
       "threshold": 0.45
-    },"full_list": {
+    },
+    "full_list": {
       "path": "templates/secretary/full_list.png",
       "threshold": 0.95
     },
