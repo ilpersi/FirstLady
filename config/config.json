@@ -17,6 +17,10 @@
   "max_retries": 3,
   "max_home_attempts": 200,
   "retry_delay": 1.0,
+  "applicant_offset": {
+    "x": 150,
+    "y": 50
+  },
   "collect_resources_interval": 300,
   "donate_alliance_interval": null,
   "screenshot_quality": 100,

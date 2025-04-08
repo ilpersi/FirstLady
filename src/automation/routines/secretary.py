@@ -302,6 +302,8 @@ class SecretaryRoutine(TimeCheckRoutine):
             app_logger.debug(f"Found {len(applicant_locations)} applicant icons:")
             for i, (x, y) in enumerate(applicant_locations):
                 app_logger.debug(f"  Applicant {i+1}: ({x}, {y})")
+
+            applicant_offset = CONFIG.get("applicant_offset", {"x": 150,"y": 50})
             
             # For each position, check if there's an applicant icon nearby
             for position_type, pos_loc in all_positions.items():
@@ -309,12 +311,12 @@ class SecretaryRoutine(TimeCheckRoutine):
                 
                 # Check each applicant icon
                 for app_x, app_y in applicant_locations:
-                    x_diff = app_x - pos_x
-                    y_diff = app_y - pos_y
-                    # Check if applicant icon is within 100 pixels horizontally and 25 pixels vertically
-                    if abs(x_diff) <= 150 and abs(y_diff) <= 50:
+                    x_diff = abs(app_x - pos_x)
+                    y_diff = abs(app_y - pos_y)
+                    # Check if applicant icon is within 150 pixels horizontally and 50 pixels vertically
+                    if x_diff <= applicant_offset["x"] and y_diff <= applicant_offset["y"]:
                         positions_to_process.append(position_type)
-                        app_logger.info(f"Found applicant for {position_type} position")
+                        app_logger.info(f"Found applicant for {position_type} position with offset {x_diff=} {y_diff=}")
                         break
             
             return positions_to_process
