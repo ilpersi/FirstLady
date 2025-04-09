@@ -27,7 +27,7 @@ def get_routine_config():
         return {}
 
 parser = argparse.ArgumentParser(description='Game automation CLI')
-parser.add_argument('command', choices=['auto', 'routine', 'reset'], help='Automation command to run')
+parser.add_argument('command', choices=['auto', 'routine', 'reset'], help='Automation command to run', default='auto')
 parser.add_argument('routine_name', nargs='?', choices=list(get_routine_config().keys()), help='Name of routine to run')
 parser.add_argument('--debug', action='store_true', help='Enable debug logging')
 parser.add_argument('--no-cleanup', action='store_true', help='Skip cleanup on exit')

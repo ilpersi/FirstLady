@@ -28,7 +28,7 @@ def take_screenshot(device_id: str) -> bool:
                 app_logger.error(f"Failed to pull screenshot: {result.stderr}")
                 return False
             
-        # Clean up device screenshot
+        # Clean up device screenshots
         cleanup_device_screenshots(device_id)
         return True
         
@@ -39,7 +39,7 @@ def take_screenshot(device_id: str) -> bool:
 def get_screen_size(device_id: str) -> Tuple[int, int]:
     """Get screen size from device"""
     try:
-        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell wm size"
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell wm size"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             app_logger.error(f"Failed to get screen size: {result.stderr}")
@@ -56,7 +56,7 @@ def get_screen_size(device_id: str) -> Tuple[int, int]:
 def cleanup_device_screenshots(device_id: str) -> None:
     """Clean up screenshots from device"""
     try:
-        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell rm -f /sdcard/screen*.png"
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell rm -f /sdcard/screen*.png"
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             app_logger.debug("Cleaned up device screenshots")

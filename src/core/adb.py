@@ -117,7 +117,7 @@ def force_stop_package(device_id: str, package_name: str):
 def press_back(device_id: str) -> bool:
     """Press back button"""
     try:
-        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input keyevent 4"
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input keyevent 4"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -128,7 +128,7 @@ def press_back(device_id: str) -> bool:
 def tap_screen(device_id: str, x: int, y: int) -> bool:
     """Tap screen at coordinates"""
     try:
-        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input tap {x} {y}"
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input tap {x} {y}"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -139,7 +139,7 @@ def tap_screen(device_id: str, x: int, y: int) -> bool:
 def swipe_screen(device_id: str, start_x: int, start_y: int, end_x: int, end_y: int, duration: int = 300) -> bool:
     """Swipe screen from start to end coordinates"""
     try:
-        cmd = f"{CONFIG.adb["binary_path"]} -s {device_id} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
         
@@ -189,7 +189,7 @@ def long_press_screen(device_id: str, x: int, y: int, duration: int) -> bool:
         duration: Press duration in milliseconds
     """
     try:
-        cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell input swipe {x} {y} {x} {y} {duration}'
+        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input swipe {x} {y} {x} {y} {duration}"
         subprocess.run(cmd, shell=True, check=True)
         return True
     except subprocess.CalledProcessError:
@@ -242,17 +242,17 @@ def simulate_shake(device_id: str, duration_ms: int = 1000) -> bool:
             
             for values in pattern:
                 # Use the full adb shell command instead of emu
-                cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell "setprop debug.sensors.accelerometer.x {values.split(":")[0]};' \
-                      f'setprop debug.sensors.accelerometer.y {values.split(":")[1]};' \
-                      f'setprop debug.sensors.accelerometer.z {values.split(":")[2]}"'
+                cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell \"setprop debug.sensors.accelerometer.x {values.split(':')[0]};" \
+                      f"setprop debug.sensors.accelerometer.y {values.split(':')[1]};" \
+                      f"setprop debug.sensors.accelerometer.z {values.split(':')[2]}\""
                 app_logger.debug(f"Executing: {cmd}")
                 subprocess.run(cmd, shell=True)
                 time.sleep(0.1)
                 
             # Reset to normal
-            cmd = f'{CONFIG.adb["binary_path"]} -s {device_id} shell "setprop debug.sensors.accelerometer.x 0;' \
-                  f'setprop debug.sensors.accelerometer.y 0;' \
-                  f'setprop debug.sensors.accelerometer.z 9.81"'
+            cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell \"setprop debug.sensors.accelerometer.x 0;" \
+                  f"setprop debug.sensors.accelerometer.y 0;" \
+                  f"setprop debug.sensors.accelerometer.z 9.81\""
             subprocess.run(cmd, shell=True)
             time.sleep(0.2)
             
