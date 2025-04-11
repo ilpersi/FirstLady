@@ -224,7 +224,8 @@ def _save_debug_image(
                 
         # Save debug image
         template_name = os.path.basename(template_name)
-        cv2.imwrite(f'tmp/debug_template_{template_name}.png', debug_img)
+        template_name = template_name + ".png" if not template_name.endswith(".png") else template_name
+        cv2.imwrite(f'tmp/debug_template_{template_name}', debug_img)
         
     except Exception as e:
         app_logger.error(f"Error saving debug image: {e}")
