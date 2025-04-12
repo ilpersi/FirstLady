@@ -2,13 +2,10 @@
   "package_name": "com.fun.lastwar.gp",
   "emulator": {
     "check_running": true,
-    "process_name": "HD-Player.exe",
+    "process_name": "MEmu.exe",
     "restart_cmd": {
-      "exe_path": "C:\\Program Files\\BlueStacks_nxt\\HD-Player.exe",
-      "args": [
-        "--instance", "Nougat32", "--cmd", "launchApp",
-        "--package","com.fun.lastwar.gp", "--source", "desktop_shortcut"
-      ]
+      "exe_path": "D:\\Program Files\\Microvirt\\MEmu\\MEmu.exe",
+      "args": []
     },
     "start_delay": 300
   },
@@ -48,9 +45,9 @@
     },
     "swipe": {
       "start_x": "50%",
-      "start_y": "40%",
+      "start_y": "30%",
       "end_x": "50%",
-      "end_y": "90%"
+      "end_y": "80%"
     }
   },
   "timings": {
@@ -265,7 +262,7 @@
   },
   "adb": {
     "host": "127.0.0.1",
-    "port": 5555,
+    "port": 21503,
     "binary_path": "D:\\Android\\SDK\\platform-tools\\adb.exe",
     "enforce_connection": true
   },
