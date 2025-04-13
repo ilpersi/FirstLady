@@ -1,14 +1,20 @@
-**/__pycache__/
-venv/
-info.txt
-tmp/*
-logs/*
-!logs/.gitkeep
-lastwar.log
-sessions/*
-!sessions/.gitkeep
-state/*
-
 # Environment variables
 .env
 
+# archives
+*\.7z
+*\.zip
+*\.rar
+
+# Run time folders
+logs/
+tmp/
+state/
+
+# Pycharm Files
+*\.iml
+\.idea
+venv/
+
+# External executables
+*\.exe
