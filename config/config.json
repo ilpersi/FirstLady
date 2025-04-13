@@ -22,6 +22,22 @@
   "donate_alliance_interval": null,
   "screenshot_quality": 100,
   "match_threshold": 0.8,
+  "auto_remove": {
+    "img_offset": {
+      "w": 180,
+      "h": 180
+    },
+    "title_cfg": {
+      "strategy": 600,
+      "security": 600,
+      "development": null,
+      "science": null,
+      "interior": 600,
+      "military": null,
+      "administrative": null
+    },
+    "remove_threshold": 0.80
+  },
   "ui_elements": {
     "profile": {
       "x": "5%",
@@ -190,6 +206,46 @@
       "path": "templates/secretary/administrative.png",
       "threshold": 0.8
     },
+    "vacant-strategy": {
+      "path": "templates/secretary/vacant-strategy.png",
+      "threshold": 0.65
+    },
+    "vacant-security": {
+      "path": "templates/secretary/vacant-security.png",
+      "threshold": 0.65
+    },
+    "vacant-development": {
+      "path": "templates/secretary/vacant-development.png",
+      "threshold": 0.65
+    },
+    "vacant-science": {
+      "path": "templates/secretary/vacant-science.png",
+      "threshold": 0.65
+    },
+    "vacant-interior": {
+      "path": "templates/secretary/vacant-interior.png",
+      "threshold": 0.65
+    },
+    "vacant-administrative": {
+      "path": "templates/secretary/vacant-administrative.png",
+      "threshold": 0.65
+    },
+    "vacant-military": {
+      "path": "templates/secretary/vacant-military.png",
+      "threshold": 0.65
+    },
+    "appoint": {
+      "path": "templates/secretary/appoint.png",
+      "threshold": 0.65
+    },
+    "dismiss": {
+      "path": "templates/secretary/dismiss.png",
+      "threshold": 0.65
+    },
+    "confirm-blue": {
+      "path": "templates/secretary/confirm-blue.png",
+      "threshold": 0.65
+    },
     "quit": {
       "path": "templates/ui/quit.png",
       "threshold": 0.65
@@ -232,6 +288,10 @@
     },
     "full_list": {
       "path": "templates/secretary/full_list.png",
+      "threshold": 0.95
+    },
+    "empty_list": {
+      "path": "templates/secretary/empty_list.png",
       "threshold": 0.95
     },
     "alliance_gifts": {
