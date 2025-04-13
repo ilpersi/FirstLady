@@ -48,7 +48,7 @@ class SecretaryRoutine(TimeCheckRoutine):
             return False
         handle_swipes(self.device_id, direction="down", num_swipes=1)
         human_delay(CONFIG['timings']['tap_delay'])
-        self.process_all_auto_remove_positions_v2()
+        self.process_all_auto_remove_positions()
         return self.process_all_secretary_positions()
 
     def find_accept_buttons(self) -> list[Tuple[int, int]]:
@@ -388,7 +388,7 @@ class SecretaryRoutine(TimeCheckRoutine):
             app_logger.error(f"Error finding positions with applicants: {e}")
             return []
 
-    def find_positions_to_remove_v2(self) -> list[str]:
+    def find_positions_to_remove(self) -> list[str]:
 
         positions_to_remove = []
 
@@ -424,9 +424,9 @@ class SecretaryRoutine(TimeCheckRoutine):
                     continue
 
                 # we check if we can find the position graphic cue
-                position = find_template(self.device_id, position_type, False)
+                position = find_template(self.device_id, position_type)
                 if position:
-                    app_logger.info(f"Position that require remove check: {position_type}")
+                    app_logger.debug(f"Position that require remove check: {position_type}")
                     positions_to_remove.append(position_type)
 
         except Exception as e:
@@ -435,8 +435,8 @@ class SecretaryRoutine(TimeCheckRoutine):
 
         return positions_to_remove
 
-    def process_all_auto_remove_positions_v2(self) -> bool:
-        positions_to_remove = self.find_positions_to_remove_v2()
+    def process_all_auto_remove_positions(self) -> bool:
+        positions_to_remove = self.find_positions_to_remove()
 
         if not positions_to_remove:
             app_logger.info("No auto-remove positions found.")
