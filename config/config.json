@@ -23,20 +23,16 @@
   "screenshot_quality": 100,
   "match_threshold": 0.8,
   "auto_remove": {
-    "img_offset": {
-      "w": 180,
-      "h": 180
-    },
+    "active": true,
     "title_cfg": {
       "strategy": 600,
       "security": 600,
       "development": null,
       "science": null,
       "interior": 600,
-      "military": null,
+      "military": 1800,
       "administrative": null
-    },
-    "remove_threshold": 0.80
+    }
   },
   "ui_elements": {
     "profile": {
@@ -327,13 +323,30 @@
     "enforce_connection": true
   },
   "arms_race": {
-    "order": ["Hero Advancement", "City Building", "Unit Progression", "Tech Research", "Drone Boos"],
+    "order": [
+      "Hero Advancement",
+      "City Building",
+      "Unit Progression",
+      "Tech Research",
+      "Drone Boos"
+    ],
     "title_map": {
-      "security" : ["Unit Progression"],
-      "development" : ["City Building"],
-      "science" : ["Tech Research"],
-      "interior" : ["Unit Progression"],
-      "administrative" : ["City Building", "Tech Research"]
+      "security": [
+        "Unit Progression"
+      ],
+      "development": [
+        "City Building"
+      ],
+      "science": [
+        "Tech Research"
+      ],
+      "interior": [
+        "Unit Progression"
+      ],
+      "administrative": [
+        "City Building",
+        "Tech Research"
+      ]
     }
   }
 }

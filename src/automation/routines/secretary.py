@@ -48,7 +48,10 @@ class SecretaryRoutine(TimeCheckRoutine):
             return False
         handle_swipes(self.device_id, direction="down", num_swipes=1)
         human_delay(CONFIG['timings']['tap_delay'])
-        self.process_all_auto_remove_positions()
+
+        if CONFIG.get("auto_remove", {}) and CONFIG["auto_remove"].get("active", True):
+            self.process_all_auto_remove_positions()
+
         return self.process_all_secretary_positions()
 
     def find_accept_buttons(self) -> list[Tuple[int, int]]:
