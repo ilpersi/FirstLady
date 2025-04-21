@@ -246,13 +246,7 @@ class SecretaryRoutine(TimeCheckRoutine):
                                     continue
                     else:
                         # No whitelist - accept all
-                        if not find_and_tap_template(
-                            self.device_id,
-                            "accept",
-                            error_msg=f"Failed to accept candidate for {name}",
-                            success_msg=f"Accepting candidate for {name}"
-                        ):
-                            continue
+                        humanized_tap(self.device_id, topmost_accept[0], topmost_accept[1])
                     
                     processed += 1
                     human_delay(CONFIG['timings']['settle_time'])
