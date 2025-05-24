@@ -18,3 +18,7 @@ venv/
 
 # External executables
 *\.exe
+
+# We only include default templates
+config/templates/*
+!config/templates/default/*

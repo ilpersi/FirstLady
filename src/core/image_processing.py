@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import time
 from typing import Optional, Tuple
+from pathlib import Path
 from .logging import app_logger
 from .device import take_screenshot
 from .config import CONFIG
@@ -11,15 +12,33 @@ import os
 
 def _load_template(template_name: str) -> Tuple[Optional[np.ndarray], Optional[dict]]:
     """Load template and its config"""
+    template_device = CONFIG['templates'].get('device', 'default')
+
     template_config = CONFIG['templates'].get(template_name)
     if not template_config:
         app_logger.error(f"Template {template_name} not found in config")
         return None, None
-        
-    template = cv2.imread(f"config/{template_config['path']}")
-    if template is None:
-        app_logger.error(f"Failed to load template: config/{template_config['path']}")
+
+    template_device_path = f'config/templates/{template_device}/{template_config["path"]}'
+    template_path = Path(template_device_path)
+    if template_device == 'default' and not template_path.exists():
+        app_logger.error(f'Template {template_name} not found in default device')
         return None, None
+    elif template_device != 'default' and not template_path.exists():
+        app_logger.warning(f'Template {template_name} not found in {template_device} device. Falling back to default.')
+        template_device_path = template_device_path.replace(template_device, 'default')
+        template_path = Path(template_device_path)
+        if not template_path.exists():
+            app_logger.error(f'Template {template_name} not found in default device')
+            return None, None
+
+    template = cv2.imread(template_device_path)
+    if template is None:
+        app_logger.error(f"Failed to load template: {template_device_path}")
+        return None, None
+
+    # This last replacement is to make sure we are compliant with the old logic
+    template_config['path'] = template_device_path.replace("config/", "")
         
     return template, template_config
 

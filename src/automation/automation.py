@@ -397,4 +397,7 @@ def verify_emulator_running() -> bool:
             # On other operating systems we assume emulator is running fine
             result = True
 
+    else:
+        result = True
+
     return result
