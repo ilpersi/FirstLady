@@ -36,9 +36,6 @@ def _load_template(template_name: str) -> Tuple[Optional[np.ndarray], Optional[d
     if template is None:
         app_logger.error(f"Failed to load template: {template_device_path}")
         return None, None
-
-    # This last replacement is to make sure we are compliant with the old logic
-    template_config['path'] = template_device_path.replace("config/", "")
         
     return template, template_config
 
