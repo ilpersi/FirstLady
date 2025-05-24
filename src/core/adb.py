@@ -77,8 +77,12 @@ def get_device_list() -> List[str]:
         )
 
         target_device = ""
-        if CONFIG.adb['host'] and CONFIG.adb['port']:
-            target_device = f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"
+        if CONFIG.adb['type'] == "tcp":
+            if CONFIG.adb['host'] and CONFIG.adb['port']:
+                target_device = f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"
+        elif CONFIG.adb['type'] == "serial":
+            if CONFIG.adb['serial']:
+                target_device = f"{CONFIG.adb['serial']}"
 
         # Parse output and get device IDs
         lines = result.stdout.strip().split('\n')[1:]  # Skip first line
