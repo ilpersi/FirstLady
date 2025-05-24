@@ -21,4 +21,5 @@ venv/
 
 # We only include default templates
 config/templates/*
-!config/templates/default/*
+!config/templates/default/
+!config/templates/default/**
