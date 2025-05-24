@@ -178,6 +178,20 @@ def get_current_running_app(device_id):
                 package_name = line.split('/')[0].split()[-1]
                 app_logger.debug(f"Current running app: {package_name}")
                 return package_name
+
+        # Android Q logic
+        result =subprocess.run(
+            [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'dumpsys', 'activity', 'recents', '|' 'grep "Recent #0"'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        package_re = re.compile(r"A=\d+:([a-zA-Z.]+)")
+        package_match = package_re.search(result.stdout)
+        if package_match:
+            package_name = package_match.group(1)
+            return package_name
+
         return None
     except subprocess.CalledProcessError as e:
         app_logger.exception(f"Failed to get current running app: {e}")
