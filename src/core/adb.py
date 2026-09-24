@@ -11,6 +11,9 @@ import socket
 import os
 import traceback
 
+_VERSION_RE = re.compile("Version ([^\r\n]+)")
+_PACKAGE_RE = re.compile(r"A=\d+:([a-zA-Z.]+)")
+
 
 def get_device_list() -> List[str]:
     """Get list of connected devices"""
@@ -24,8 +27,7 @@ def get_device_list() -> List[str]:
                 cmd,
                 capture_output=True,
                 text=True,
-                check=True,
-                shell=True
+                check=True
             )
 
         except (FileNotFoundError, subprocess.CalledProcessError):
@@ -47,8 +49,7 @@ def get_device_list() -> List[str]:
                         cmd,
                         capture_output=True,
                         text=True,
-                        check=True,
-                        shell=True
+                        check=True
                     )
                     break
             else:
@@ -57,8 +58,7 @@ def get_device_list() -> List[str]:
                 return []
 
         lines = result.stdout.strip()
-        version_re = re.compile("Version ([^\r\n]+)")
-        version_match = version_re.search(lines)
+        version_match = _VERSION_RE.search(lines)
         if version_match:
             adb_version = version_match.group(1)
             app_logger.debug(f"Found adb version: {adb_version}")
@@ -72,8 +72,7 @@ def get_device_list() -> List[str]:
             cmd,
             capture_output=True,
             text=True,
-            check=True,
-            shell=True  # Required for Windows compatibility
+            check=True
         )
 
         target_device = ""
@@ -121,10 +120,10 @@ def force_stop_package(device_id: str, package_name: str):
 def press_back(device_id: str) -> bool:
     """Press back button"""
     try:
-        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input keyevent 4"
+        cmd = [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'input', 'keyevent', '4']
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
-        
+
     except Exception as e:
         app_logger.error(f"Error pressing back: {e}")
         return False
@@ -132,10 +131,10 @@ def press_back(device_id: str) -> bool:
 def tap_screen(device_id: str, x: int, y: int) -> bool:
     """Tap screen at coordinates"""
     try:
-        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input tap {x} {y}"
+        cmd = [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'input', 'tap', str(x), str(y)]
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
-        
+
     except Exception as e:
         app_logger.error(f"Error tapping screen: {e}")
         return False
@@ -143,10 +142,13 @@ def tap_screen(device_id: str, x: int, y: int) -> bool:
 def swipe_screen(device_id: str, start_x: int, start_y: int, end_x: int, end_y: int, duration: int = 300) -> bool:
     """Swipe screen from start to end coordinates"""
     try:
-        cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell input swipe {start_x} {start_y} {end_x} {end_y} {duration}"
+        cmd = [
+            CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'input', 'swipe',
+            str(start_x), str(start_y), str(end_x), str(end_y), str(duration)
+        ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.returncode == 0
-        
+
     except Exception as e:
         app_logger.error(f"Error swiping screen: {e}")
         return False
@@ -186,8 +188,7 @@ def get_current_running_app(device_id):
             text=True,
             check=True
         )
-        package_re = re.compile(r"A=\d+:([a-zA-Z.]+)")
-        package_match = package_re.search(result.stdout)
+        package_match = _PACKAGE_RE.search(result.stdout)
         if package_match:
             package_name = package_match.group(1)
             return package_name
@@ -289,6 +290,5 @@ def enforce_connection():
                 cmd,
                 capture_output=True,
                 text=True,
-                check=True,
-                shell=True  # Required for Windows compatibility
+                check=True
             )

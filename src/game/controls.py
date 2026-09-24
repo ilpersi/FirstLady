@@ -4,8 +4,7 @@ import time
 import random
 from src.core.image_processing import find_and_tap_template, find_template, wait_for_image
 from src.core.logging import app_logger
-from src.core.device import get_screen_size
-from src.core.adb import force_stop_package, launch_package, press_back, swipe_screen, tap_screen, long_press_screen
+from src.core.adb import force_stop_package, launch_package, press_back, swipe_screen, tap_screen, long_press_screen, get_screen_size
 from src.core.config import CONFIG
 
 def human_delay(delay: float):
@@ -14,7 +13,7 @@ def human_delay(delay: float):
 
 def handle_swipes(device_id: str, direction: str = "up", num_swipes: int = 8) -> None:
     """Handle scrolling with swipes"""
-    height, width = get_screen_size(device_id)
+    width, height = get_screen_size(device_id)
     
     swipe_cfg = CONFIG['ui_elements']['swipe']
     variance_pct = float(CONFIG['randomization']['swipe_variance']['position'].strip('%')) / 100

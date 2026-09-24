@@ -54,12 +54,19 @@ class SecretaryRoutine(TimeCheckRoutine):
 
         return self.process_all_secretary_positions()
 
-    def find_accept_buttons(self) -> list[Tuple[int, int]]:
-        """Find all accept buttons on the screen and sort by Y coordinate"""
+    def find_accept_buttons(self, existing_screenshot=None) -> list[Tuple[int, int]]:
+        """Find all accept buttons on the screen and sort by Y coordinate
+
+        Args:
+            existing_screenshot: reuse this already-captured screenshot instead
+                of taking a fresh one, when the caller already knows nothing
+                has changed on screen since it was taken.
+        """
         try:
             matches = find_all_templates(
                 self.device_id,
-                "accept"
+                "accept",
+                existing_screenshot=existing_screenshot
             )
             if not matches:
                 return []
@@ -199,7 +206,7 @@ class SecretaryRoutine(TimeCheckRoutine):
                     if current_screenshot is None:
                         break
 
-                    accept_locations = self.find_accept_buttons()
+                    accept_locations = self.find_accept_buttons(existing_screenshot=current_screenshot)
                     if not accept_locations:
                         break
 
@@ -298,14 +305,20 @@ class SecretaryRoutine(TimeCheckRoutine):
 
             human_delay(CONFIG['timings']['tap_delay'])
 
+            # Take one screenshot and reuse it for both checks below - nothing
+            # taps the screen between them, so they're reading the same state.
+            current_screenshot = None
+            if take_screenshot(self.device_id):
+                current_screenshot = cv2.imread('tmp/screen.png')
+
             # There is still people queued, so probably the 5 min timer is still running
-            if not find_template(self.device_id, "empty_list"):
+            if not find_template(self.device_id, "empty_list", existing_screenshot=current_screenshot):
                 app_logger.info(f"Players are still queued for position {name}")
                 self.last_approve[name] = datetime.datetime.now()
             else:
 
                 if find_template(self.device_id,
-                                 "appoint"):
+                                 "appoint", existing_screenshot=current_screenshot):
                     if find_and_tap_template(self.device_id,
                                              "dismiss",
                                              error_msg=f"Impossible to find the dismiss button for position {name}",
@@ -344,13 +357,20 @@ class SecretaryRoutine(TimeCheckRoutine):
         try:
             positions_to_process = []
 
+            # One screenshot, reused for every template check below - this is
+            # reading a single static menu screen, nothing taps in between.
+            current_screenshot = None
+            if take_screenshot(self.device_id):
+                current_screenshot = cv2.imread('tmp/screen.png')
+
             # Find all secretary positions
             all_positions = {}
             secretary_types = self.secretary_types + self.additionalTypes
             for position_type in secretary_types:
                 positions = find_all_templates(
                     self.device_id,
-                    position_type
+                    position_type,
+                    existing_screenshot=current_screenshot
                 )
                 if positions:
                     all_positions[position_type] = positions[0]  # Take first match for each type
@@ -358,7 +378,8 @@ class SecretaryRoutine(TimeCheckRoutine):
             # Find all applicant icons
             applicant_locations = find_all_templates(
                 self.device_id,
-                "has_applicant"
+                "has_applicant",
+                existing_screenshot=current_screenshot
             )
 
             if not applicant_locations:
@@ -406,6 +427,13 @@ class SecretaryRoutine(TimeCheckRoutine):
             if not title_cfg:
                 return []
 
+            # One screenshot, reused for every template check below - this
+            # whole function is read-only (nothing taps), so the screen can't
+            # have changed between any of these checks.
+            current_screenshot = None
+            if take_screenshot(self.device_id):
+                current_screenshot = cv2.imread('tmp/screen.png')
+
             # We check for vacant positions
             for position_type in secretary_types:
 
@@ -421,13 +449,13 @@ class SecretaryRoutine(TimeCheckRoutine):
                     continue
 
                 # we check if the position is vacant
-                if find_template(self.device_id, f"vacant-{position_type}"):
+                if find_template(self.device_id, f"vacant-{position_type}", existing_screenshot=current_screenshot):
                     app_logger.info(f"{position_type} is vacant.")
                     self.last_approve[position_type] = datetime.datetime.now()
                     continue
 
                 # we check if we can find the position graphic cue
-                position = find_template(self.device_id, position_type)
+                position = find_template(self.device_id, position_type, existing_screenshot=current_screenshot)
                 if position:
                     app_logger.debug(f"Position that require remove check: {position_type}")
                     positions_to_remove.append(position_type)

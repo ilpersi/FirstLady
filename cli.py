@@ -26,9 +26,13 @@ def get_routine_config():
     except Exception:
         return {}
 
+# Read config/automation.json once and reuse it for both the argparse
+# choices below and run_single_routine's lookup.
+ROUTINE_CONFIG = get_routine_config()
+
 parser = argparse.ArgumentParser(description='Game automation CLI')
 parser.add_argument('command', choices=['auto', 'routine', 'reset'], help='Automation command to run', default='auto')
-parser.add_argument('routine_name', nargs='?', choices=list(get_routine_config().keys()), help='Name of routine to run')
+parser.add_argument('routine_name', nargs='?', choices=list(ROUTINE_CONFIG.keys()), help='Name of routine to run')
 parser.add_argument('--debug', action='store_true', help='Enable debug logging')
 parser.add_argument('--no-cleanup', action='store_true', help='Skip cleanup on exit')
 
@@ -47,7 +51,7 @@ def signal_handler(signum, frame):
 def run_single_routine(device_id: str, routine_name: str) -> bool:
     """Run a single routine"""
     try:
-        routine_config = get_routine_config().get(routine_name)
+        routine_config = ROUTINE_CONFIG.get(routine_name)
         if not routine_config:
             app_logger.error(f"Routine {routine_name} not found in config")
             return False

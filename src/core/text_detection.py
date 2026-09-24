@@ -6,7 +6,8 @@ import pytesseract
 import re
 from typing import Tuple, Optional, Union, List, Dict, Any
 from .logging import app_logger
-from .device import take_screenshot, get_screen_size
+from .device import take_screenshot
+from .adb import get_screen_size
 from .image_processing import _load_template, _take_and_load_screenshot, find_template, find_all_templates
 from .config import CONFIG
 from .debug import save_debug_region
@@ -14,9 +15,11 @@ import numpy as np
 import json
 from pathlib import Path
 
-debug = True
-
 # pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+
+_NON_ALNUM_RE = re.compile(r'[^a-zA-Z0-9]')
+_BRACKET_TEXT_RE = re.compile(r'[\[|(]{0,1}([^]|)]+)[]|)]{0,1}')
+_ALLIANCE_WORD_RE = re.compile(r'[A-Za-z0-9]{3,4}')
 
 def get_text_regions(
     accept_location: Tuple[int, int], 
@@ -63,28 +66,19 @@ def get_text_regions(
     if y2 - y1 < min_height:
         y2 = min(height, y1 + min_height)
     
-    # Take screenshot and crop to search region
-    if not take_screenshot(device_id):
-        return (0, 0, 0, 0), (0, 0, 0, 0), None
-        
-    img = cv2.imread('tmp/screen.png')
-    if img is None:
-        return (0, 0, 0, 0), (0, 0, 0, 0), None
-        
-    # Crop image to search region
-    search_region = img[y1:y2, x1:x2]
-    
-    # Find brackets within cropped region
+    # Find brackets within the search region (reusing the screenshot resolved above)
     left_brackets = find_all_templates(
         device_id,
         "left_bracket",
-        search_region=(x1, y1, x2, y2)
+        search_region=(x1, y1, x2, y2),
+        existing_screenshot=img
     )
-    
+
     right_brackets = find_all_templates(
         device_id,
         "right_bracket",
-        search_region=(x1, y1, x2, y2)
+        search_region=(x1, y1, x2, y2),
+        existing_screenshot=img
     )
     
     # Filter brackets by vertical alignment with accept button
@@ -130,7 +124,8 @@ def get_text_regions(
             min(height, y_center + y_padding)
         )
         
-        save_debug_region(device_id, alliance_region, "alliance")
+        if CONFIG.debug_mode:
+            save_debug_region(device_id, alliance_region, "alliance")
         return alliance_region, name_region, img
     
     # Fallback case with wider ratio
@@ -150,13 +145,14 @@ def get_text_regions(
     name_region = (split_x, y1, x2, y2)
     
     # Save debug image for fallback case too
-    save_debug_region(device_id, alliance_region, "alliance")
-    
+    if CONFIG.debug_mode:
+        save_debug_region(device_id, alliance_region, "alliance")
+
     return alliance_region, name_region, img
 
 def clean_text(text: str) -> str:
     """Strip non-alphanumeric characters from text"""
-    return re.sub(r'[^a-zA-Z0-9]', '', text)
+    return _NON_ALNUM_RE.sub('', text)
 
 def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], languages: Union[str, List[str]] = 'eng', img: Optional[np.ndarray] = None) -> str:
     if img is None:
@@ -185,8 +181,9 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
         binary = cv2.dilate(binary, kernel, iterations=1)
         
         # Save debug images
-        cv2.imwrite('tmp/debug_alliance_original.png', cropped)
-        cv2.imwrite('tmp/debug_alliance_processed.png', binary)
+        if CONFIG.debug_mode:
+            cv2.imwrite('tmp/debug_alliance_original.png', cropped)
+            cv2.imwrite('tmp/debug_alliance_processed.png', binary)
         
         # OCR with specific config for pixel font
         config = (
@@ -204,12 +201,12 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
         text = text.replace('—', '').replace('–', '').strip()
         
         # Try to extract text between brackets first
-        bracket_match = re.search(r'[\[|(]{0,1}([^]|)]+)[]|)]{0,1}', text)
+        bracket_match = _BRACKET_TEXT_RE.search(text)
         if bracket_match:
             return bracket_match.group(1), original_text
-            
+
         # If no brackets, look for 3-4 letter sequences that match alliance patterns
-        words = re.findall(r'[A-Za-z0-9]{3,4}', text)
+        words = _ALLIANCE_WORD_RE.findall(text)
         if words:
             # Take first word that matches length of known alliances
             for word in words:

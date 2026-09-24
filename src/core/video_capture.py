@@ -1,3 +1,5 @@
+"""Screen recording for an ADB device (not the host desktop)."""
+
 import cv2
 import time
 import os
@@ -5,21 +7,26 @@ from datetime import datetime
 from threading import Thread, Event
 import logging
 
+from src.core.adb import get_screen_size
+from src.core.device import take_screenshot
+
 logger = logging.getLogger(__name__)
 
 class VideoCapture:
-    def __init__(self, output_dir="records"):
+    def __init__(self, device_id: str, output_dir="records"):
         """Initialize the video capture system.
-        
+
         Args:
+            device_id: ADB device identifier to record from.
             output_dir (str): Directory where recordings will be stored
         """
+        self.device_id = device_id
         self.output_dir = output_dir
         self.recording = False
         self._stop_event = Event()
         self._recording_thread = None
         self.current_video = None
-        
+
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
         
@@ -61,32 +68,25 @@ class VideoCapture:
     def _record(self):
         """Internal method that handles the actual recording process."""
         try:
-            # Initialize screen capture
-            import numpy as np
-            from PIL import ImageGrab
-            
-            # Get screen size
-            screen = ImageGrab.grab()
-            width, height = screen.size
-            
+            width, height = get_screen_size(self.device_id)
+
             # Initialize video writer
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             out = cv2.VideoWriter(self.current_video, fourcc, 20.0, (width, height))
-            
+
             while not self._stop_event.is_set():
-                # Capture screen
-                frame = np.array(ImageGrab.grab())
-                # Convert from RGB to BGR (OpenCV uses BGR)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                
-                # Write frame
-                out.write(frame)
-                
-                # Small sleep to reduce CPU usage
-                time.sleep(0.05)  # 20 FPS
-                
+                # Capture the device's screen via ADB (each screenshot is an
+                # ADB round trip, so this is best-effort - actual frame rate
+                # depends on device/connection speed, not just this sleep).
+                if take_screenshot(self.device_id):
+                    frame = cv2.imread('tmp/screen.png')
+                    if frame is not None:
+                        out.write(frame)
+
+                time.sleep(0.05)
+
         except Exception as e:
             logger.error(f"Error during recording: {str(e)}")
         finally:
             if 'out' in locals():
-                out.release() 
+                out.release()

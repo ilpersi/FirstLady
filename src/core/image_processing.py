@@ -10,9 +10,21 @@ from .device import take_screenshot
 from .config import CONFIG
 import os
 
+_template_cache: dict[Tuple[str, str], Tuple[np.ndarray, dict]] = {}
+
 def _load_template(template_name: str) -> Tuple[Optional[np.ndarray], Optional[dict]]:
-    """Load template and its config"""
+    """Load template and its config, caching successful loads in memory.
+
+    Failures are never cached: a missing/misconfigured template should keep
+    failing loudly (and stay hot-fixable without a restart) rather than being
+    silently remembered as "always fails" for the life of the process.
+    """
     template_device = CONFIG['templates'].get('device', 'default')
+
+    cache_key = (template_device, template_name)
+    cached = _template_cache.get(cache_key)
+    if cached is not None:
+        return cached
 
     template_config = CONFIG['templates'].get(template_name)
     if not template_config:
@@ -36,7 +48,8 @@ def _load_template(template_name: str) -> Tuple[Optional[np.ndarray], Optional[d
     if template is None:
         app_logger.error(f"Failed to load template: {template_device_path}")
         return None, None
-        
+
+    _template_cache[cache_key] = (template, template_config)
     return template, template_config
 
 def _take_and_load_screenshot(device_id: str) -> Optional[np.ndarray]:
@@ -54,29 +67,33 @@ def _take_and_load_screenshot(device_id: str) -> Optional[np.ndarray]:
 
 def find_template(
     device_id: str,
-    template_name: str
+    template_name: str,
+    existing_screenshot: Optional[np.ndarray] = None
 ) -> Optional[Tuple[int, int]]:
-    """Find template in image and return center coordinates"""
+    """Find template in image and return center coordinates
+
+    Args:
+        existing_screenshot: reuse this already-captured screenshot instead of
+            taking a fresh one. Pass this when several template lookups need
+            to agree on the same "moment in time" on screen.
+    """
     try:
         app_logger.debug(f"Looking for template: {template_name}")
-        
+
         template, template_config = _load_template(template_name)
         if template is None:
             app_logger.debug(f"Failed to load template: {template_name}")
             return None
-            
+
         app_logger.debug(f"Template loaded successfully. Shape: {template.shape}")
-        
-        # Take screenshot first
-        if not take_screenshot(device_id):
-            app_logger.error("Failed to take screenshot")
-            return None
-            
-        img = cv2.imread('tmp/screen.png')
-        if img is None:
-            app_logger.debug("Failed to load screenshot")
-            return None
-            
+
+        if existing_screenshot is not None:
+            img = existing_screenshot
+        else:
+            img = _take_and_load_screenshot(device_id)
+            if img is None:
+                return None
+
         app_logger.debug(f"Screenshot loaded successfully. Shape: {img.shape}")
         
         # Match template
@@ -94,15 +111,17 @@ def find_template(
             return None
             
         app_logger.debug(f"Match value {max_val:.4f} EXCEEDS threshold {threshold} !")
-        
-        # Save debug image
-        debug_img = img.copy()
+
         h, w = template.shape[:2]
-        cv2.rectangle(debug_img, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 255, 0), 2)
-        cv2.putText(debug_img, f"{max_val:.3f}", (max_loc[0], max_loc[1] - 5),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-        cv2.imwrite(f'tmp/debug_find_{template_name}.png', debug_img)
-        
+
+        # Save debug image
+        if CONFIG.debug_mode:
+            debug_img = img.copy()
+            cv2.rectangle(debug_img, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 255, 0), 2)
+            cv2.putText(debug_img, f"{max_val:.3f}", (max_loc[0], max_loc[1] - 5),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            cv2.imwrite(f'tmp/debug_find_{template_name}.png', debug_img)
+
         # Get template dimensions and calculate center point
         center_x = max_loc[0] + w//2
         center_y = max_loc[1] + h//2
@@ -117,50 +136,64 @@ def find_template(
 def find_all_templates(
     device_id: str,
     template_name: str,
-    search_region: Tuple[int, int, int, int] = None
+    search_region: Tuple[int, int, int, int] = None,
+    existing_screenshot: Optional[np.ndarray] = None,
+    max_matches: int = 50
 ) -> list[Tuple[int, int]]:
-    """Find all template matches in image and return center coordinates"""
+    """Find all template matches in image and return center coordinates
+
+    Args:
+        existing_screenshot: reuse this already-captured screenshot instead of
+            taking a fresh one. Pass this when several template lookups need
+            to agree on the same "moment in time" on screen.
+        max_matches: safety cap on the number of matches to collect, so a
+            misconfigured/generic template (broad match, low threshold) can't
+            stall the suppression loop below.
+    """
     try:
         template, template_config = _load_template(template_name)
         if template is None:
             return []
-            
+
         h, w = template.shape[:2]
-        
-        img = _take_and_load_screenshot(device_id)
-        if img is None:
-            return []
-            
+
+        if existing_screenshot is not None:
+            img = existing_screenshot
+        else:
+            img = _take_and_load_screenshot(device_id)
+            if img is None:
+                return []
+
         # Get region to search
         if search_region:
             x1, y1, x2, y2 = search_region
             img_region = img[y1:y2, x1:x2]
         else:
             img_region = img
-            
+
         result = cv2.matchTemplate(img_region, template, cv2.TM_CCOEFF_NORMED)
         threshold = template_config.get('threshold', CONFIG['match_threshold'])
-            
+
         matches = []
         result_copy = result.copy()
-        
-        while True:
+
+        while len(matches) < max_matches:
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result_copy)
             if max_val < threshold:
                 break
-                
+
             # Store match with confidence
             center_x = max_loc[0] + w//2
             center_y = max_loc[1] + h//2
             matches.append((center_x, center_y, max_val))
-            
+
             # Suppress region
             x1_sup = max(0, max_loc[0] - w//2)
             y1_sup = max(0, max_loc[1] - h//2)
             x2_sup = min(result_copy.shape[1], max_loc[0] + w//2)
             y2_sup = min(result_copy.shape[0], max_loc[1] + h//2)
             result_copy[y1_sup:y2_sup, x1_sup:x2_sup] = 0
-        
+
         # Adjust coordinates if search region was used
         adjusted_matches = []
         for x, y, conf in matches:
@@ -170,8 +203,9 @@ def find_all_templates(
             adjusted_matches.append((x, y))
             
         # Save debug image
-        _save_debug_image(img, template_config['path'], matches, search_region, (w, h))
-        
+        if CONFIG.debug_mode:
+            _save_debug_image(img, template_config['path'], matches, search_region, (w, h))
+
         app_logger.debug(f"Found {len(matches)} matches for {template_name} with threshold {threshold}")
         return adjusted_matches
         
@@ -247,21 +281,29 @@ def _save_debug_image(
         app_logger.error(f"Error saving debug image: {e}")
 
 def find_and_tap_template(
-    device_id: str, 
+    device_id: str,
     template_name: str,
     error_msg: Optional[str] = None,
     success_msg: Optional[str] = None,
     long_press: bool = False,
     press_duration: float = 1.0,
     critical: bool = False,
-    timeout: float = None
+    timeout: float = None,
+    existing_screenshot: Optional[np.ndarray] = None
 ) -> bool:
-    """Find and tap a template on screen"""
+    """Find and tap a template on screen
+
+    Args:
+        existing_screenshot: reuse this already-captured screenshot instead of
+            taking a fresh one. Only honored when `timeout` is not set —
+            `wait_for_image` polls over time, so it must always look at a
+            fresh screenshot on each attempt.
+    """
     if timeout:
         location = wait_for_image(device_id, template_name, timeout=timeout)
     else:
-        location = find_template(device_id, template_name)
-    
+        location = find_template(device_id, template_name, existing_screenshot=existing_screenshot)
+
     if location is None:
         if error_msg:
             if critical:

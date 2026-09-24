@@ -37,6 +37,12 @@ class MainAutomation:
         self.handlers = {}
         self.handler_factory = HandlerFactory()
         self.game_state = {"is_home": False}
+        # Throttle the foreground-app check (a `dumpsys window windows` shell
+        # call) instead of running it on every ~1s idle tick - the fastest
+        # active routine interval today is 40s, so a 5s cadence still catches
+        # a crashed/closed game with plenty of margin.
+        self._last_game_check = 0.0
+        self._game_check_interval = 5
         
     def cleanup(self):
         """Cleanup resources"""
@@ -182,9 +188,11 @@ class MainAutomation:
         if not verify_emulator_running():
             return False
 
-        # Ensure game is running
-        if not self.verify_game_running():
-            return False
+        # Ensure game is running (throttled - see __init__)
+        if time.time() - self._last_game_check >= self._game_check_interval:
+            if not self.verify_game_running():
+                return False
+            self._last_game_check = time.time()
 
         # Run scheduled tasks
         self.run_scheduled_tasks()
@@ -193,11 +201,6 @@ class MainAutomation:
     def resume(self) -> bool:
         return self.start()
     
-    def get_ordered_check_names(self) -> list[str]:
-        """Get check names in order from config"""
-        config = self.load_automation_config()
-        return list(config.get("time_checks", {}).keys())
-
     def get_ordered_tasks(self) -> list[tuple[str, float, str]]:
         """Get all tasks ordered by how overdue they are"""
         current_time = time.time()

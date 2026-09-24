@@ -27,6 +27,19 @@ class ConfigManager:
             if not self._automation_config:
                 self._automation_config = {}
 
+        # Resolve once so repeated .control_list/.adb access (on nearly every
+        # ADB call in the program) isn't rebuilding a default dict each time.
+        self._control_list = self._config.get('control_list', {
+            "whitelist": {"alliance": []},
+            "blacklist": {"alliance": []}
+        })
+        self._adb = self._config.get('adb', {
+            "host": "",
+            "port": -1,
+            "binary_path": "adb",
+            "enforce_connection": False
+        })
+
     def __getitem__(self, key: str) -> Any:
         """Allow dictionary-style access to main config"""
         return self._config.get(key, {})
@@ -44,21 +57,18 @@ class ConfigManager:
         return self._automation_config.get("scheduled_events", {})
 
     @property
+    def debug_mode(self) -> bool:
+        """Whether debug artifacts (overlay images, OCR crops) should be written to tmp/"""
+        return bool(self._config.get('debug_mode', False))
+
+    @property
     def control_list(self) -> Dict[str, Any]:
         """Get control list from main config"""
-        return self._config.get('control_list', {
-            "whitelist": {"alliance": []},
-            "blacklist": {"alliance": []}
-        })
+        return self._control_list
 
     @property
     def adb(self) -> Dict[str, Any]:
-        return self._config.get('adb', {
-            "host": "",
-            "port": -1,
-            "binary_path": "adb",
-            "enforce_connection": False
-        })
+        return self._adb
 
 
 # Create global instances
