@@ -115,195 +115,195 @@
   },
   "templates": {
     "left_bracket": {
-      "path": "templates/ui/left_bracket.png",
+      "path": "ui/left_bracket.png",
       "threshold": 0.75
     },
     "right_bracket": {
-      "path": "templates/ui/right_bracket.png",
+      "path": "ui/right_bracket.png",
       "threshold": 0.75
     },
     "accept": {
-      "path": "templates/secretary/accept.png",
+      "path": "secretary/accept.png",
       "threshold": 0.6
     },
     "reject": {
-      "path": "templates/ui/reject.png",
+      "path": "ui/reject.png",
       "threshold": 0.6
     },
     "confirm": {
-      "path": "templates/secretary/confirm.png",
+      "path": "secretary/confirm.png",
       "threshold": 0.6
     },
     "help": {
-      "path": "templates/ui/help.png",
+      "path": "ui/help.png",
       "threshold": 0.8
     },
     "home": {
-      "path": "templates/ui/home.png",
+      "path": "ui/home.png",
       "threshold": 0.8
     },
     "start": {
-      "path": "templates/ui/start.png",
+      "path": "ui/start.png",
       "threshold": 0.75
     },
     "alliance": {
-      "path": "templates/alliance/alliance.png",
+      "path": "alliance/alliance.png",
       "threshold": 0.55
     },
     "alliance_tech_icon": {
-      "path": "templates/alliance/alliance_tech_icon.png",
+      "path": "alliance/alliance_tech_icon.png",
       "threshold": 0.55
     },
     "recommended_flag": {
-      "path": "templates/alliance/recommended_flag.png",
+      "path": "alliance/recommended_flag.png",
       "threshold": 0.55
     },
     "donate_button": {
-      "path": "templates/alliance/donate_button.png",
+      "path": "alliance/donate_button.png",
       "threshold": 0.55
     },
     "president": {
-      "path": "templates/secretary/president.png",
+      "path": "secretary/president.png",
       "threshold": 0.4
     },
     "capitol_menu": {
-      "path": "templates/secretary/capitol_menu.png",
+      "path": "secretary/capitol_menu.png",
       "threshold": 0.4
     },
     "list": {
-      "path": "templates/ui/list.png",
+      "path": "ui/list.png",
       "threshold": 0.6
     },
     "strategy": {
-      "path": "templates/secretary/strategy.png",
+      "path": "secretary/strategy.png",
       "threshold": 0.8
     },
     "security": {
-      "path": "templates/secretary/security.png",
+      "path": "secretary/security.png",
       "threshold": 0.8
     },
     "development": {
-      "path": "templates/secretary/development.png",
+      "path": "secretary/development.png",
       "threshold": 0.8
     },
     "science": {
-      "path": "templates/secretary/science.png",
+      "path": "secretary/science.png",
       "threshold": 0.8
     },
     "interior": {
-      "path": "templates/secretary/interior.png",
+      "path": "secretary/interior.png",
       "threshold": 0.8
     },
     "military": {
-      "path": "templates/secretary/military.png",
+      "path": "secretary/military.png",
       "threshold": 0.8
     },
     "administrative": {
-      "path": "templates/secretary/administrative.png",
+      "path": "secretary/administrative.png",
       "threshold": 0.8
     },
     "vacant-strategy": {
-      "path": "templates/secretary/vacant-strategy.png",
+      "path": "secretary/vacant-strategy.png",
       "threshold": 0.65
     },
     "vacant-security": {
-      "path": "templates/secretary/vacant-security.png",
+      "path": "secretary/vacant-security.png",
       "threshold": 0.65
     },
     "vacant-development": {
-      "path": "templates/secretary/vacant-development.png",
+      "path": "secretary/vacant-development.png",
       "threshold": 0.65
     },
     "vacant-science": {
-      "path": "templates/secretary/vacant-science.png",
+      "path": "secretary/vacant-science.png",
       "threshold": 0.65
     },
     "vacant-interior": {
-      "path": "templates/secretary/vacant-interior.png",
+      "path": "secretary/vacant-interior.png",
       "threshold": 0.65
     },
     "vacant-administrative": {
-      "path": "templates/secretary/vacant-administrative.png",
+      "path": "secretary/vacant-administrative.png",
       "threshold": 0.65
     },
     "vacant-military": {
-      "path": "templates/secretary/vacant-military.png",
+      "path": "secretary/vacant-military.png",
       "threshold": 0.65
     },
     "appoint": {
-      "path": "templates/secretary/appoint.png",
+      "path": "secretary/appoint.png",
       "threshold": 0.65
     },
     "dismiss": {
-      "path": "templates/secretary/dismiss.png",
+      "path": "secretary/dismiss.png",
       "threshold": 0.65
     },
     "confirm-blue": {
-      "path": "templates/secretary/confirm-blue.png",
+      "path": "secretary/confirm-blue.png",
       "threshold": 0.65
     },
     "quit": {
-      "path": "templates/ui/quit.png",
+      "path": "ui/quit.png",
       "threshold": 0.65
     },
     "awesome": {
-      "path": "templates/ui/awesome.png",
+      "path": "ui/awesome.png",
       "threshold": 0.75
     },
     "secret_task": {
-      "path": "templates/ui/secret_task.png",
+      "path": "ui/secret_task.png",
       "threshold": 0.75
     },
     "dig": {
-      "path": "templates/ui/dig.png",
+      "path": "ui/dig.png",
       "threshold": 0.75
     },
     "hidden_treasures": {
-      "path": "templates/hidden_treasures/hidden_treasures_tab.png",
+      "path": "hidden_treasures/hidden_treasures_tab.png",
       "threshold": 0.75
     },
     "hidden_treasures_exchange": {
-      "path": "templates/hidden_treasures/hidden_treasures_exchange.png",
+      "path": "hidden_treasures/hidden_treasures_exchange.png",
       "threshold": 0.75
     },
     "hidden_treasures_start_exchange": {
-      "path": "templates/hidden_treasures/hidden_treasures_start_exchange.png",
+      "path": "hidden_treasures/hidden_treasures_start_exchange.png",
       "threshold": 0.75
     },
     "hidden_treasures_allies_exchange": {
-      "path": "templates/hidden_treasures/hidden_treasures_allies_exchange.png",
+      "path": "hidden_treasures/hidden_treasures_allies_exchange.png",
       "threshold": 0.75
     },
     "hidden_treasures_confirm_exchange": {
-      "path": "templates/hidden_treasures/hidden_treasures_confirm_exchange.png",
+      "path": "hidden_treasures/hidden_treasures_confirm_exchange.png",
       "threshold": 0.75
     },
     "has_applicant": {
-      "path": "templates/secretary/hasApplicant.png",
+      "path": "secretary/hasApplicant.png",
       "threshold": 0.45
     },
     "full_list": {
-      "path": "templates/secretary/full_list.png",
+      "path": "secretary/full_list.png",
       "threshold": 0.95
     },
     "empty_list": {
-      "path": "templates/secretary/empty_list.png",
+      "path": "secretary/empty_list.png",
       "threshold": 0.95
     },
     "alliance_gifts": {
-      "path": "templates/alliance/gifts.png",
+      "path": "alliance/gifts.png",
       "threshold": 0.65
     },
     "alliance_claim_all": {
-      "path": "templates/alliance/claim_all.png",
+      "path": "alliance/claim_all.png",
       "threshold": 0.65
     },
     "alliance_claim": {
-      "path": "templates/alliance/claim.png",
+      "path": "alliance/claim.png",
       "threshold": 0.80
     },
     "alliance_gift_premium": {
-      "path": "templates/alliance/premium.png",
+      "path": "alliance/premium.png",
       "threshold": 0.65
     }
   },

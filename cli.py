@@ -10,6 +10,7 @@ from src.core.adb import get_connected_device
 from src.automation.automation import MainAutomation, verify_emulator_running
 from src.core.cleanup import CleanupManager
 from src.automation.handler_factory import HandlerFactory
+from src.core.interactive_console import InteractiveConsole
 
 
 def get_routine_config():
@@ -98,6 +99,7 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
+    console = None
     try:
         if args.command == 'routine':
             if not args.routine_name:
@@ -105,25 +107,29 @@ def main():
                 return 1
             success = run_single_routine(device_id, args.routine_name)
             return 0 if success else 1
-            
+
         elif args.command == 'auto':
+            console = InteractiveConsole(device_id)
+            console.start()
             automation = MainAutomation(device_id, debug=args.debug)
             success = automation.run()
             return 0 if success else 1
-            
+
         elif args.command == 'reset':
             automation = MainAutomation(device_id, debug=args.debug)
             success = automation.force_reset()
             if not success:
                 app_logger.error("Failed to reset game")
                 sys.exit(1)
-            
+
     except Exception as e:
         app_logger.error(f"Error in main: {e}")
         if args.debug:
             traceback.print_exc()
         return 1
     finally:
+        if console:
+            console.stop()
         cleanup()
 
 if __name__ == '__main__':

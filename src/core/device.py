@@ -25,6 +25,26 @@ def take_screenshot(device_id: str) -> bool:
         app_logger.error(f"Error taking screenshot: {e}")
         return False
 
+def pull_screenshot_to(device_id: str, output_path: str) -> bool:
+    """Pull a screenshot to a caller-supplied path, independent of `take_screenshot`'s
+    fixed `tmp/screen.png` target - lets a concurrent on-demand capture avoid racing
+    whatever the main automation loop is doing with that shared file."""
+    try:
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+        cmd = [CONFIG.adb["binary_path"], "-s", device_id, "exec-out", "screencap", "-p"]
+        with open(output_path, "wb") as outfile:
+            result = subprocess.run(cmd, stdout=outfile)
+            if result.returncode != 0:
+                app_logger.error(f"Failed to pull screenshot to {output_path}: {result.stderr}")
+                return False
+
+        return True
+
+    except Exception as e:
+        app_logger.error(f"Error pulling screenshot to {output_path}: {e}")
+        return False
+
 def cleanup_device_screenshots(device_id: str) -> None:
     """Clean up screenshots from device"""
     try:

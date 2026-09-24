@@ -10,6 +10,7 @@
 logs/
 tmp/
 state/
+screenshots/
 
 # Pycharm Files
 *\.iml

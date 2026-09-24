@@ -65,6 +65,20 @@ def _take_and_load_screenshot(device_id: str) -> Optional[np.ndarray]:
         
     return img
 
+def _draw_match_overlay(
+    img: np.ndarray,
+    top_left: Tuple[int, int],
+    size: Tuple[int, int],
+    confidence: float
+) -> np.ndarray:
+    """Return a copy of img with a match rectangle + confidence score drawn at top_left"""
+    w, h = size
+    overlay = img.copy()
+    cv2.rectangle(overlay, top_left, (top_left[0] + w, top_left[1] + h), (0, 255, 0), 2)
+    cv2.putText(overlay, f"{confidence:.3f}", (top_left[0], top_left[1] - 5),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+    return overlay
+
 def find_template(
     device_id: str,
     template_name: str,
@@ -116,10 +130,7 @@ def find_template(
 
         # Save debug image
         if CONFIG.debug_mode:
-            debug_img = img.copy()
-            cv2.rectangle(debug_img, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 255, 0), 2)
-            cv2.putText(debug_img, f"{max_val:.3f}", (max_loc[0], max_loc[1] - 5),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            debug_img = _draw_match_overlay(img, max_loc, (w, h), max_val)
             cv2.imwrite(f'tmp/debug_find_{template_name}.png', debug_img)
 
         # Get template dimensions and calculate center point
@@ -132,7 +143,46 @@ def find_template(
     except Exception as e:
         app_logger.error(f"Error finding template {template_name}: {e}")
         return None
-    
+
+def find_template_debug(
+    device_id: str,
+    template_name: str,
+    existing_screenshot: Optional[np.ndarray] = None
+) -> Optional[dict]:
+    """Like find_template, but always returns match details regardless of pass/fail -
+    for on-demand inspection tooling that needs to show "closest match was X, below
+    your threshold" rather than a bare None. Does not affect find_template's own
+    contract or write any debug_mode-gated files."""
+    try:
+        template, template_config = _load_template(template_name)
+        if template is None:
+            return None
+
+        if existing_screenshot is not None:
+            img = existing_screenshot
+        else:
+            img = _take_and_load_screenshot(device_id)
+            if img is None:
+                return None
+
+        h, w = template.shape[:2]
+        result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        threshold = template_config.get('threshold', CONFIG['match_threshold'])
+
+        return {
+            "found": max_val >= threshold,
+            "center": (max_loc[0] + w // 2, max_loc[1] + h // 2),
+            "confidence": max_val,
+            "top_left": max_loc,
+            "size": (w, h),
+            "threshold": threshold,
+        }
+
+    except Exception as e:
+        app_logger.error(f"Error finding template (debug) {template_name}: {e}")
+        return None
+
 def find_all_templates(
     device_id: str,
     template_name: str,
@@ -267,10 +317,7 @@ def _save_debug_image(
             for x, y, conf in matches:
                 rect_x = x - w//2
                 rect_y = y - h//2
-                cv2.rectangle(debug_img, (rect_x, rect_y), 
-                            (rect_x + w, rect_y + h), (0, 255, 0), 2)
-                cv2.putText(debug_img, f"{conf:.3f}", (rect_x, rect_y - 5),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                debug_img = _draw_match_overlay(debug_img, (rect_x, rect_y), (w, h), conf)
                 
         # Save debug image
         template_name = os.path.basename(template_name)
