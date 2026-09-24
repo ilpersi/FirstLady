@@ -7,28 +7,12 @@ from pathlib import Path
 import shutil
 from src.core.config import CONFIG
 
-def take_screenshot(device_id: str) -> bool:
-    """Take screenshot and pull to local tmp directory"""
-    try:
-        ensure_dir("tmp")
-
-        cmd = [CONFIG.adb["binary_path"], "exec-out", "screencap","-p"]
-        with open('tmp/screen.png', "w") as outfile:
-            result =  subprocess.run(cmd, stdout=outfile)
-            if result.returncode != 0:
-                app_logger.error(f"Failed to pull screenshot: {result.stderr}")
-                return False
-
-        return True
-
-    except Exception as e:
-        app_logger.error(f"Error taking screenshot: {e}")
-        return False
-
 def pull_screenshot_to(device_id: str, output_path: str) -> bool:
-    """Pull a screenshot to a caller-supplied path, independent of `take_screenshot`'s
-    fixed `tmp/screen.png` target - lets a concurrent on-demand capture avoid racing
-    whatever the main automation loop is doing with that shared file."""
+    """Pull a screenshot to a caller-supplied path. `take_screenshot` is a thin
+    wrapper around this for the shared `tmp/screen.png` target - a caller that
+    needs its own distinct file (e.g. a concurrent on-demand capture that must
+    not race whatever the main automation loop is doing with that shared file)
+    should call this directly instead."""
     try:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
@@ -44,6 +28,10 @@ def pull_screenshot_to(device_id: str, output_path: str) -> bool:
     except Exception as e:
         app_logger.error(f"Error pulling screenshot to {output_path}: {e}")
         return False
+
+def take_screenshot(device_id: str) -> bool:
+    """Take screenshot and pull to local tmp/screen.png"""
+    return pull_screenshot_to(device_id, "tmp/screen.png")
 
 def cleanup_device_screenshots(device_id: str) -> None:
     """Clean up screenshots from device"""

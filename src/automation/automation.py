@@ -37,10 +37,11 @@ class MainAutomation:
         self.handlers = {}
         self.handler_factory = HandlerFactory()
         self.game_state = {"is_home": False}
-        # Throttle the foreground-app check (a `dumpsys window windows` shell
-        # call) instead of running it on every ~1s idle tick - the fastest
-        # active routine interval today is 40s, so a 5s cadence still catches
-        # a crashed/closed game with plenty of margin.
+        # Throttle the emulator-process check (TASKLIST on Windows) and the
+        # foreground-app check (a `dumpsys window windows` shell call)
+        # instead of running them on every ~1s idle tick - the fastest active
+        # routine interval today is 40s, so a 5s cadence still catches a
+        # crashed emulator/game with plenty of margin.
         self._last_game_check = 0.0
         self._game_check_interval = 5
         
@@ -184,12 +185,13 @@ class MainAutomation:
         self.time_checks = update_interval_check(self.time_checks, time.time())
         self.scheduled_events = update_schedule(self.scheduled_events, time.time())
 
-        # Ensure Android Emulator is running
-        if not verify_emulator_running():
-            return False
-
-        # Ensure game is running (throttled - see __init__)
+        # Ensure emulator + game are running (throttled - see __init__). If the
+        # emulator isn't running the game obviously isn't either, so one gate
+        # covers both checks instead of spawning a TASKLIST process on every
+        # ~1s idle tick.
         if time.time() - self._last_game_check >= self._game_check_interval:
+            if not verify_emulator_running():
+                return False
             if not self.verify_game_running():
                 return False
             self._last_game_check = time.time()

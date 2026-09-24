@@ -2,10 +2,12 @@
 
 import time
 import random
+import cv2
 from src.core.image_processing import find_and_tap_template, find_template, wait_for_image
 from src.core.logging import app_logger
 from src.core.adb import force_stop_package, launch_package, press_back, swipe_screen, tap_screen, long_press_screen, get_screen_size
 from src.core.config import CONFIG
+from src.core.device import take_screenshot
 
 def human_delay(delay: float):
     """Add a human-like delay between actions"""
@@ -99,15 +101,23 @@ def launch_game(device_id: str):
     
     start_time = time.time()
     while time.time() - start_time < CONFIG['timings']['launch_max_wait']:
+        # One screenshot per iteration, reused for both checks below - unless
+        # the "start" button gets tapped, which changes the screen, so "home"
+        # must then be checked against a fresh screenshot instead.
+        screenshot = None
+        if take_screenshot(device_id):
+            screenshot = cv2.imread('tmp/screen.png')
+
         # Check for start button first
-        start_loc = find_template(device_id, "start")
+        start_loc = find_template(device_id, "start", existing_screenshot=screenshot)
         if start_loc:
             app_logger.debug("Found start button, clicking it")
             humanized_tap(device_id, start_loc[0], start_loc[1])
             human_delay(CONFIG['timings']['menu_animation'])
-        
+            screenshot = None
+
         # Check for home icon
-        home_loc = find_template(device_id, "home")
+        home_loc = find_template(device_id, "home", existing_screenshot=screenshot)
         if home_loc:
             app_logger.debug("Found home icon")
             time.sleep(CONFIG['timings']['launch_wait'])

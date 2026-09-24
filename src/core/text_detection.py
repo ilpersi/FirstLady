@@ -186,11 +186,12 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
             cv2.imwrite('tmp/debug_alliance_processed.png', binary)
         
         # OCR with specific config for pixel font
+        tessedit_write_images = 1 if CONFIG.debug_mode else 0
         config = (
             '--psm 7 '  # Single line mode
             '--oem 1 '  # LSTM only
             # f'-c tessedit_char_whitelist={ALLIANCE_CHARS}[] '
-            '-c tessedit_write_images=1 '
+            f'-c tessedit_write_images={tessedit_write_images} '
             '-c textord_min_linesize=2 '
             '-c edges_max_children_per_outline=40'
         )
