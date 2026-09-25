@@ -8,7 +8,7 @@ from threading import Thread, Event
 import logging
 
 from src.core.adb import get_screen_size
-from src.core.device import take_screenshot
+from src.core.image_processing import _take_and_load_screenshot
 
 logger = logging.getLogger(__name__)
 
@@ -78,10 +78,11 @@ class VideoCapture:
                 # Capture the device's screen via ADB (each screenshot is an
                 # ADB round trip, so this is best-effort - actual frame rate
                 # depends on device/connection speed, not just this sleep).
-                if take_screenshot(self.device_id):
-                    frame = cv2.imread('tmp/screen.png')
-                    if frame is not None:
-                        out.write(frame)
+                # Captured directly in memory - a frame is only ever decoded
+                # once and written straight to the video, never persisted.
+                frame = _take_and_load_screenshot(self.device_id)
+                if frame is not None:
+                    out.write(frame)
 
                 time.sleep(0.05)
 

@@ -1,11 +1,9 @@
 import datetime
 from typing import Tuple
-import cv2
 from src.automation.routines.routineBase import TimeCheckRoutine
 from src.core.logging import app_logger
 from src.core.config import CONFIG
-from src.core.image_processing import find_template, find_all_templates, wait_for_image, find_and_tap_template
-from src.core.device import take_screenshot
+from src.core.image_processing import find_template, find_all_templates, wait_for_image, find_and_tap_template, _take_and_load_screenshot
 from src.core.adb import get_screen_size, press_back
 from src.game.controls import human_delay, humanized_tap, handle_swipes
 from src.core.text_detection import (
@@ -199,10 +197,7 @@ class SecretaryRoutine(TimeCheckRoutine):
                 accepted = 0
 
                 while processed < 5:  # Max 8 applicants
-                    if not take_screenshot(self.device_id):
-                        break
-
-                    current_screenshot = cv2.imread('tmp/screen.png')
+                    current_screenshot = _take_and_load_screenshot(self.device_id)
                     if current_screenshot is None:
                         break
 
@@ -307,9 +302,7 @@ class SecretaryRoutine(TimeCheckRoutine):
 
             # Take one screenshot and reuse it for both checks below - nothing
             # taps the screen between them, so they're reading the same state.
-            current_screenshot = None
-            if take_screenshot(self.device_id):
-                current_screenshot = cv2.imread('tmp/screen.png')
+            current_screenshot = _take_and_load_screenshot(self.device_id)
 
             # There is still people queued, so probably the 5 min timer is still running
             if not find_template(self.device_id, "empty_list", existing_screenshot=current_screenshot):
@@ -359,9 +352,7 @@ class SecretaryRoutine(TimeCheckRoutine):
 
             # One screenshot, reused for every template check below - this is
             # reading a single static menu screen, nothing taps in between.
-            current_screenshot = None
-            if take_screenshot(self.device_id):
-                current_screenshot = cv2.imread('tmp/screen.png')
+            current_screenshot = _take_and_load_screenshot(self.device_id)
 
             # Find all secretary positions
             all_positions = {}
@@ -430,9 +421,7 @@ class SecretaryRoutine(TimeCheckRoutine):
             # One screenshot, reused for every template check below - this
             # whole function is read-only (nothing taps), so the screen can't
             # have changed between any of these checks.
-            current_screenshot = None
-            if take_screenshot(self.device_id):
-                current_screenshot = cv2.imread('tmp/screen.png')
+            current_screenshot = _take_and_load_screenshot(self.device_id)
 
             # We check for vacant positions
             for position_type in secretary_types:

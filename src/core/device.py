@@ -1,11 +1,42 @@
 """Device interaction utilities"""
 
 import subprocess
+from typing import Optional
 
 from .logging import app_logger
 from pathlib import Path
 import shutil
 from src.core.config import CONFIG
+
+def ensure_dir(path: str) -> None:
+    """Ensure directory exists"""
+    Path(path).mkdir(exist_ok=True)
+
+# tmp/ must always exist for CONFIG.debug_mode-gated writes elsewhere (which
+# no longer get it created as a side effect of every screenshot capture, now
+# that the internal matching pipeline captures in memory - see
+# capture_screenshot_bytes below). Mirrors logs/ being created the same way
+# at import time in src/core/logging.py.
+ensure_dir("tmp")
+
+def capture_screenshot_bytes(device_id: str) -> Optional[bytes]:
+    """Pull a screenshot straight into memory - no disk round-trip. For
+    callers that only need to decode it once (the internal template-matching
+    pipeline via _take_and_load_screenshot in image_processing.py) rather
+    than needing a persisted file (that's what pull_screenshot_to/
+    take_screenshot are for, e.g. the interactive on-demand capture console,
+    where producing an actual file is the point)."""
+    try:
+        cmd = [CONFIG.adb["binary_path"], "-s", device_id, "exec-out", "screencap", "-p"]
+        result = subprocess.run(cmd, capture_output=True)
+        if result.returncode != 0:
+            app_logger.error(f"Failed to capture screenshot: {result.stderr}")
+            return None
+        return result.stdout
+
+    except Exception as e:
+        app_logger.error(f"Error capturing screenshot: {e}")
+        return None
 
 def pull_screenshot_to(device_id: str, output_path: str) -> bool:
     """Pull a screenshot to a caller-supplied path. `take_screenshot` is a thin
@@ -69,12 +100,12 @@ def cleanup_temp_files() -> None:
                 app_logger.warning(f"Failed to delete tmp directory: {e}")
     except Exception as e:
         app_logger.error(f"Error cleaning temporary files: {e}")
+    finally:
+        # Recreate it immediately so it's always available for the next
+        # CONFIG.debug_mode-gated write, regardless of what ran above.
+        ensure_dir("tmp")
 
 def cleanup(device_id: str) -> None:
     """Cleanup device and local temp files"""
     cleanup_device_screenshots(device_id)
     cleanup_temp_files()
-
-def ensure_dir(path: str) -> None:
-    """Ensure directory exists"""
-    Path(path).mkdir(exist_ok=True)

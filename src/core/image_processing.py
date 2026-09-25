@@ -6,7 +6,7 @@ import time
 from typing import Optional, Tuple
 from pathlib import Path
 from .logging import app_logger
-from .device import take_screenshot
+from .device import capture_screenshot_bytes
 from .config import CONFIG
 import os
 
@@ -53,16 +53,20 @@ def _load_template(template_name: str) -> Tuple[Optional[np.ndarray], Optional[d
     return template, template_config
 
 def _take_and_load_screenshot(device_id: str) -> Optional[np.ndarray]:
-    """Take and load a screenshot"""
-    if not take_screenshot(device_id):
+    """Take and decode a screenshot directly in memory - no disk round-trip.
+    Nothing here needs the file to persist, just the decoded array; callers
+    that do need a persisted file (e.g. the interactive capture console)
+    should use pull_screenshot_to/take_screenshot instead."""
+    data = capture_screenshot_bytes(device_id)
+    if data is None:
         app_logger.error("Failed to take screenshot")
         return None
-        
-    img = cv2.imread('tmp/screen.png')
+
+    img = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
     if img is None:
-        app_logger.error("Failed to load screenshot")
+        app_logger.error("Failed to decode screenshot")
         return None
-        
+
     return img
 
 def _draw_match_overlay(

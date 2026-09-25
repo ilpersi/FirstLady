@@ -6,7 +6,6 @@ import pytesseract
 import re
 from typing import Tuple, Optional, Union, List, Dict, Any
 from .logging import app_logger
-from .device import take_screenshot
 from .adb import get_screen_size
 from .image_processing import _load_template, _take_and_load_screenshot, find_template, find_all_templates
 from .config import CONFIG
@@ -156,9 +155,7 @@ def clean_text(text: str) -> str:
 
 def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], languages: Union[str, List[str]] = 'eng', img: Optional[np.ndarray] = None) -> str:
     if img is None:
-        if not take_screenshot(device_id):
-            return "", ""
-        img = cv2.imread('tmp/screen.png')
+        img = _take_and_load_screenshot(device_id)
         if img is None:
             return "", ""
     
