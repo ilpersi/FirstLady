@@ -12,6 +12,11 @@ tmp/
 state/
 screenshots/
 
+# Python bytecode / pytest cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
 # Pycharm Files
 *\.iml
 \.idea

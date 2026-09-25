@@ -68,7 +68,7 @@ def cleanup_device_screenshots(device_id: str) -> None:
     """Clean up screenshots from device"""
     try:
         cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell rm -f /sdcard/screen*.png"
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if result.returncode == 0:
             app_logger.debug("Cleaned up device screenshots")
         else:

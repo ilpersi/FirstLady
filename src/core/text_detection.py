@@ -153,15 +153,17 @@ def clean_text(text: str) -> str:
     """Strip non-alphanumeric characters from text"""
     return _NON_ALNUM_RE.sub('', text)
 
-def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], languages: Union[str, List[str]] = 'eng', img: Optional[np.ndarray] = None) -> str:
+def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], languages: Union[str, List[str]] = 'eng', img: Optional[np.ndarray] = None) -> Tuple[str, str]:
     if img is None:
         img = _take_and_load_screenshot(device_id)
         if img is None:
             return "", ""
-    
+
+    original_text = ""
+
     x1, y1, x2, y2 = region
     cropped = img[y1:y2, x1:x2]
-    
+
     if languages == 'eng':
         # Convert to grayscale
         gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
@@ -187,7 +189,7 @@ def extract_text_from_region(device_id: str, region: Tuple[int, int, int, int], 
         config = (
             '--psm 7 '  # Single line mode
             '--oem 1 '  # LSTM only
-            # f'-c tessedit_char_whitelist={ALLIANCE_CHARS}[] '
+            f'-c tessedit_char_whitelist={ALLIANCE_CHARS}[] '
             f'-c tessedit_write_images={tessedit_write_images} '
             '-c textord_min_linesize=2 '
             '-c edges_max_children_per_outline=40'

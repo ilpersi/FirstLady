@@ -52,8 +52,13 @@ def update_schedule(events: dict[str, ScheduledEvent], current_time: float) -> d
             target_hour, target_min = map(int, event["time"].split(':'))
             target_dt = current_dt.replace(hour=target_hour, minute=target_min)
             
-            # Calculate time difference in minutes
-            time_diff = abs((current_dt - target_dt).total_seconds() / 60)
+            # Calculate time difference in minutes, accounting for
+            # midnight wraparound (e.g. 23:59 current vs. a 00:02 target is
+            # ~3 minutes apart, not ~1437 - target_dt is always built on
+            # current_dt's own date via .replace(), so a naive diff would
+            # never fire an event scheduled for just after midnight UTC).
+            raw_diff = (current_dt - target_dt).total_seconds() / 60
+            time_diff = min(abs(raw_diff), 1440 - abs(raw_diff))
             app_logger.debug(f"Time difference for {event_name}: {time_diff:.1f} minutes (UTC)")
             
             # Check if within 5 minute window

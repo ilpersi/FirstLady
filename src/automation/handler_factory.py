@@ -64,7 +64,7 @@ class HandlerFactory:
                 
                 # Set last_check from saved state if available
                 if "last_check" in config:
-                    handler.last_check = config["last_check"]
+                    handler._last_run = config["last_check"]
                     
                 return handler
                 

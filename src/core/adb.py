@@ -76,11 +76,11 @@ def get_device_list() -> List[str]:
         )
 
         target_device = ""
-        if CONFIG.adb['type'] == "tcp":
+        if CONFIG.adb.get('type', 'tcp') == "tcp":
             if CONFIG.adb['host'] and CONFIG.adb['port']:
                 target_device = f"{CONFIG.adb['host']}:{CONFIG.adb['port']}"
-        elif CONFIG.adb['type'] == "serial":
-            if CONFIG.adb['serial']:
+        elif CONFIG.adb.get('type') == "serial":
+            if CONFIG.adb.get('serial'):
                 target_device = f"{CONFIG.adb['serial']}"
 
         # Parse output and get device IDs
@@ -181,14 +181,29 @@ def get_current_running_app(device_id):
                 app_logger.debug(f"Current running app: {package_name}")
                 return package_name
 
-        # Android Q logic
-        result =subprocess.run(
-            [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'dumpsys', 'activity', 'recents', '|' 'grep "Recent #0"'],
+        # Android Q logic. There is no shell to pipe through here (no
+        # shell=True, argv is a literal list), so filtering down to the
+        # "Recent #0" task has to happen client-side in Python instead of
+        # via a (never actually executed) `| grep "Recent #0"`.
+        result = subprocess.run(
+            [CONFIG.adb["binary_path"], '-s', device_id, 'shell', 'dumpsys', 'activity', 'recents'],
             capture_output=True,
             text=True,
             check=True
         )
-        package_match = _PACKAGE_RE.search(result.stdout)
+        recent_0_lines = []
+        in_recent_0 = False
+        for line in result.stdout.splitlines():
+            if 'Recent #0' in line:
+                in_recent_0 = True
+                recent_0_lines.append(line)
+                continue
+            if in_recent_0:
+                if 'Recent #' in line:
+                    break
+                recent_0_lines.append(line)
+
+        package_match = _PACKAGE_RE.search('\n'.join(recent_0_lines))
         if package_match:
             package_name = package_match.group(1)
             return package_name
@@ -266,14 +281,14 @@ def simulate_shake(device_id: str, duration_ms: int = 1000) -> bool:
                       f"setprop debug.sensors.accelerometer.z {values.split(':')[2]}\""
                 app_logger.debug(f"Executing: {cmd}")
                 subprocess.run(cmd, shell=True)
-                time.sleep(0.1)
-                
+                time.sleep(0.1 * (duration_ms / 1000))
+
             # Reset to normal
             cmd = f"{CONFIG.adb['binary_path']} -s {device_id} shell \"setprop debug.sensors.accelerometer.x 0;" \
                   f"setprop debug.sensors.accelerometer.y 0;" \
                   f"setprop debug.sensors.accelerometer.z 9.81\""
             subprocess.run(cmd, shell=True)
-            time.sleep(0.2)
+            time.sleep(0.2 * (duration_ms / 1000))
             
         return True
             

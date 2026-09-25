@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 from src.core.logging import app_logger
 from typing import Optional, Dict, Any
@@ -69,16 +69,16 @@ class TimeCheckRoutine(RoutineBase):
 class DailyRoutine(RoutineBase):
     """Base class for daily scheduled routines"""
     
-    def __init__(self, device_id: str, day: str, time: str):
-        super().__init__(device_id)
+    def __init__(self, device_id: str, day: str, time: str, automation=None):
+        super().__init__(device_id, automation)
         self.day = day.lower()
         self.time = time
         self.last_run = None
         
     def should_run(self) -> bool:
-        current_dt = datetime.fromtimestamp(time.time(), datetime.UTC)
+        current_dt = datetime.fromtimestamp(time.time(), timezone.utc)
         if self.last_run:
-            last_dt = datetime.fromtimestamp(self.last_run, datetime.UTC)
+            last_dt = datetime.fromtimestamp(self.last_run, timezone.utc)
             if last_dt.date() == current_dt.date():
                 return False
                 

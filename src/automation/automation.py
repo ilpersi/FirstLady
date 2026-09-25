@@ -303,8 +303,7 @@ class MainAutomation:
                             discord = DiscordNotifier()
                             discord.webhook_url = webhook_url
                             asyncio.run(discord.send_notification(
-                                "🔄 **Game Launch Failed**",
-                                f"Unable to launch game, retrying every 10 minutes.\nRetry count: {retry_count}"
+                                f"🔄 **Game Launch Failed**\nUnable to launch game, retrying every 10 minutes.\nRetry count: {retry_count}"
                             ))
                             last_notification_time = current_time
                         except Exception as e:
