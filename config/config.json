@@ -1,7 +1,13 @@
 {
   "package_name": "com.fun.lastwar.gp",
+  "adb": {
+    "host": "127.0.0.1",
+    "port": 21503,
+    "binary_path": "D:\\Android\\SDK\\platform-tools\\adb.exe",
+    "enforce_connection": true
+  },
   "emulator": {
-    "check_running": true,
+    "check_running": false,
     "process_name": "MEmu.exe",
     "restart_cmd": {
       "exe_path": "D:\\Program Files\\Microvirt\\MEmu\\MEmu.exe",
@@ -9,19 +15,19 @@
     },
     "start_delay": 300
   },
-  "sleep_multiplier": 1.0,
   "debug_mode": false,
+  "sleep_multiplier": 1.0,
   "max_retries": 3,
   "max_home_attempts": 200,
   "retry_delay": 1.0,
+  "screenshot_quality": 100,
+  "match_threshold": 0.8,
+  "collect_resources_interval": 300,
+  "donate_alliance_interval": null,
   "applicant_offset": {
     "x": 150,
     "y": 50
   },
-  "collect_resources_interval": 300,
-  "donate_alliance_interval": null,
-  "screenshot_quality": 100,
-  "match_threshold": 0.8,
   "auto_remove": {
     "active": true,
     "title_cfg": {
@@ -32,6 +38,14 @@
       "interior": 600,
       "military": 1800,
       "administrative": null
+    }
+  },
+  "control_list": {
+    "whitelist": {
+      "alliance": []
+    },
+    "blacklist": {
+      "alliance": []
     }
   },
   "ui_elements": {
@@ -105,223 +119,6 @@
     "psm_mode": 8,
     "oem_mode": 3
   },
-  "control_list": {
-    "whitelist": {
-      "alliance": []
-    },
-    "blacklist": {
-      "alliance": []
-    }
-  },
-  "templates": {
-    "left_bracket": {
-      "path": "ui/left_bracket.png",
-      "threshold": 0.75
-    },
-    "right_bracket": {
-      "path": "ui/right_bracket.png",
-      "threshold": 0.75
-    },
-    "accept": {
-      "path": "secretary/accept.png",
-      "threshold": 0.6
-    },
-    "reject": {
-      "path": "ui/reject.png",
-      "threshold": 0.6
-    },
-    "confirm": {
-      "path": "secretary/confirm.png",
-      "threshold": 0.6
-    },
-    "help": {
-      "path": "ui/help.png",
-      "threshold": 0.8
-    },
-    "home": {
-      "path": "ui/home.png",
-      "threshold": 0.8
-    },
-    "start": {
-      "path": "ui/start.png",
-      "threshold": 0.75
-    },
-    "alliance": {
-      "path": "alliance/alliance.png",
-      "threshold": 0.55
-    },
-    "alliance_tech_icon": {
-      "path": "alliance/alliance_tech_icon.png",
-      "threshold": 0.55
-    },
-    "recommended_flag": {
-      "path": "alliance/recommended_flag.png",
-      "threshold": 0.55
-    },
-    "donate_button": {
-      "path": "alliance/donate_button.png",
-      "threshold": 0.55
-    },
-    "president": {
-      "path": "secretary/president.png",
-      "threshold": 0.4
-    },
-    "capitol_menu": {
-      "path": "secretary/capitol_menu.png",
-      "threshold": 0.4
-    },
-    "list": {
-      "path": "ui/list.png",
-      "threshold": 0.6
-    },
-    "strategy": {
-      "path": "secretary/strategy.png",
-      "threshold": 0.8
-    },
-    "security": {
-      "path": "secretary/security.png",
-      "threshold": 0.8
-    },
-    "development": {
-      "path": "secretary/development.png",
-      "threshold": 0.8
-    },
-    "science": {
-      "path": "secretary/science.png",
-      "threshold": 0.8
-    },
-    "interior": {
-      "path": "secretary/interior.png",
-      "threshold": 0.8
-    },
-    "military": {
-      "path": "secretary/military.png",
-      "threshold": 0.8
-    },
-    "administrative": {
-      "path": "secretary/administrative.png",
-      "threshold": 0.8
-    },
-    "vacant-strategy": {
-      "path": "secretary/vacant-strategy.png",
-      "threshold": 0.65
-    },
-    "vacant-security": {
-      "path": "secretary/vacant-security.png",
-      "threshold": 0.65
-    },
-    "vacant-development": {
-      "path": "secretary/vacant-development.png",
-      "threshold": 0.65
-    },
-    "vacant-science": {
-      "path": "secretary/vacant-science.png",
-      "threshold": 0.65
-    },
-    "vacant-interior": {
-      "path": "secretary/vacant-interior.png",
-      "threshold": 0.65
-    },
-    "vacant-administrative": {
-      "path": "secretary/vacant-administrative.png",
-      "threshold": 0.65
-    },
-    "vacant-military": {
-      "path": "secretary/vacant-military.png",
-      "threshold": 0.65
-    },
-    "appoint": {
-      "path": "secretary/appoint.png",
-      "threshold": 0.65
-    },
-    "dismiss": {
-      "path": "secretary/dismiss.png",
-      "threshold": 0.65
-    },
-    "confirm-blue": {
-      "path": "secretary/confirm-blue.png",
-      "threshold": 0.65
-    },
-    "quit": {
-      "path": "ui/quit.png",
-      "threshold": 0.65
-    },
-    "awesome": {
-      "path": "ui/awesome.png",
-      "threshold": 0.75
-    },
-    "secret_task": {
-      "path": "ui/secret_task.png",
-      "threshold": 0.75
-    },
-    "dig": {
-      "path": "ui/dig.png",
-      "threshold": 0.75
-    },
-    "hidden_treasures": {
-      "path": "hidden_treasures/hidden_treasures_tab.png",
-      "threshold": 0.75
-    },
-    "hidden_treasures_exchange": {
-      "path": "hidden_treasures/hidden_treasures_exchange.png",
-      "threshold": 0.75
-    },
-    "hidden_treasures_start_exchange": {
-      "path": "hidden_treasures/hidden_treasures_start_exchange.png",
-      "threshold": 0.75
-    },
-    "hidden_treasures_allies_exchange": {
-      "path": "hidden_treasures/hidden_treasures_allies_exchange.png",
-      "threshold": 0.75
-    },
-    "hidden_treasures_confirm_exchange": {
-      "path": "hidden_treasures/hidden_treasures_confirm_exchange.png",
-      "threshold": 0.75
-    },
-    "has_applicant": {
-      "path": "secretary/hasApplicant.png",
-      "threshold": 0.45
-    },
-    "full_list": {
-      "path": "secretary/full_list.png",
-      "threshold": 0.95
-    },
-    "empty_list": {
-      "path": "secretary/empty_list.png",
-      "threshold": 0.95
-    },
-    "alliance_gifts": {
-      "path": "alliance/gifts.png",
-      "threshold": 0.65
-    },
-    "alliance_claim_all": {
-      "path": "alliance/claim_all.png",
-      "threshold": 0.65
-    },
-    "alliance_claim": {
-      "path": "alliance/claim.png",
-      "threshold": 0.80
-    },
-    "alliance_gift_premium": {
-      "path": "alliance/premium.png",
-      "threshold": 0.65
-    }
-  },
-  "discord": {
-    "bot_name": "Tina\ubd07",
-    "dig_notification": {
-      "content": "<:digEmote:1305924160949846106> **NEW DIG / \uc0c8\ub85c\uc6b4 \ubc1c\uad74**",
-      "embed_title": ":zap: Action Required / \uc870\uce58 \ud544\uc694",
-      "embed_value": ":flag_us: A new dig has been posted! Get digging!\n:flag_kr: \uc0c8\ub85c\uc6b4 \ubc1c\uad74\uc774 \uac8c\uc2dc\ub418\uc5c8\uc2b5\ub2c8\ub2e4! \ubc1c\uad74\uc744 \uc2dc\uc791\ud558\uc138\uc694!",
-      "embed_color": "0xFF0000"
-    }
-  },
-  "adb": {
-    "host": "127.0.0.1",
-    "port": 21503,
-    "binary_path": "D:\\Android\\SDK\\platform-tools\\adb.exe",
-    "enforce_connection": true
-  },
   "arms_race": {
     "order": [
       "Hero Advancement",
@@ -347,6 +144,209 @@
         "City Building",
         "Tech Research"
       ]
+    }
+  },
+  "templates": {
+    "alliance": {
+      "path": "alliance/alliance.png",
+      "threshold": 0.55
+    },
+    "alliance_claim": {
+      "path": "alliance/claim.png",
+      "threshold": 0.80
+    },
+    "alliance_claim_all": {
+      "path": "alliance/claim_all.png",
+      "threshold": 0.65
+    },
+    "alliance_gift_premium": {
+      "path": "alliance/premium.png",
+      "threshold": 0.65
+    },
+    "alliance_gifts": {
+      "path": "alliance/gifts.png",
+      "threshold": 0.65
+    },
+    "alliance_tech_icon": {
+      "path": "alliance/alliance_tech_icon.png",
+      "threshold": 0.55
+    },
+    "donate_button": {
+      "path": "alliance/donate_button.png",
+      "threshold": 0.55
+    },
+    "recommended_flag": {
+      "path": "alliance/recommended_flag.png",
+      "threshold": 0.55
+    },
+    "hidden_treasures": {
+      "path": "hidden_treasures/hidden_treasures_tab.png",
+      "threshold": 0.75
+    },
+    "hidden_treasures_allies_exchange": {
+      "path": "hidden_treasures/hidden_treasures_allies_exchange.png",
+      "threshold": 0.75
+    },
+    "hidden_treasures_confirm_exchange": {
+      "path": "hidden_treasures/hidden_treasures_confirm_exchange.png",
+      "threshold": 0.75
+    },
+    "hidden_treasures_exchange": {
+      "path": "hidden_treasures/hidden_treasures_exchange.png",
+      "threshold": 0.75
+    },
+    "hidden_treasures_start_exchange": {
+      "path": "hidden_treasures/hidden_treasures_start_exchange.png",
+      "threshold": 0.75
+    },
+    "accept": {
+      "path": "secretary/accept.png",
+      "threshold": 0.6
+    },
+    "administrative": {
+      "path": "secretary/administrative.png",
+      "threshold": 0.8
+    },
+    "appoint": {
+      "path": "secretary/appoint.png",
+      "threshold": 0.65
+    },
+    "capitol_menu": {
+      "path": "secretary/capitol_menu.png",
+      "threshold": 0.4
+    },
+    "confirm": {
+      "path": "secretary/confirm.png",
+      "threshold": 0.6
+    },
+    "confirm-blue": {
+      "path": "secretary/confirm-blue.png",
+      "threshold": 0.65
+    },
+    "development": {
+      "path": "secretary/development.png",
+      "threshold": 0.8
+    },
+    "dismiss": {
+      "path": "secretary/dismiss.png",
+      "threshold": 0.65
+    },
+    "empty_list": {
+      "path": "secretary/empty_list.png",
+      "threshold": 0.95
+    },
+    "full_list": {
+      "path": "secretary/full_list.png",
+      "threshold": 0.95
+    },
+    "has_applicant": {
+      "path": "secretary/hasApplicant.png",
+      "threshold": 0.45
+    },
+    "interior": {
+      "path": "secretary/interior.png",
+      "threshold": 0.8
+    },
+    "military": {
+      "path": "secretary/military.png",
+      "threshold": 0.8
+    },
+    "president": {
+      "path": "secretary/president.png",
+      "threshold": 0.4
+    },
+    "science": {
+      "path": "secretary/science.png",
+      "threshold": 0.8
+    },
+    "security": {
+      "path": "secretary/security.png",
+      "threshold": 0.8
+    },
+    "strategy": {
+      "path": "secretary/strategy.png",
+      "threshold": 0.8
+    },
+    "vacant-administrative": {
+      "path": "secretary/vacant-administrative.png",
+      "threshold": 0.65
+    },
+    "vacant-development": {
+      "path": "secretary/vacant-development.png",
+      "threshold": 0.65
+    },
+    "vacant-interior": {
+      "path": "secretary/vacant-interior.png",
+      "threshold": 0.65
+    },
+    "vacant-military": {
+      "path": "secretary/vacant-military.png",
+      "threshold": 0.65
+    },
+    "vacant-science": {
+      "path": "secretary/vacant-science.png",
+      "threshold": 0.65
+    },
+    "vacant-security": {
+      "path": "secretary/vacant-security.png",
+      "threshold": 0.65
+    },
+    "vacant-strategy": {
+      "path": "secretary/vacant-strategy.png",
+      "threshold": 0.65
+    },
+    "awesome": {
+      "path": "ui/awesome.png",
+      "threshold": 0.75
+    },
+    "dig": {
+      "path": "ui/dig.png",
+      "threshold": 0.75
+    },
+    "help": {
+      "path": "ui/help.png",
+      "threshold": 0.8
+    },
+    "home": {
+      "path": "ui/home.png",
+      "threshold": 0.8
+    },
+    "left_bracket": {
+      "path": "ui/left_bracket.png",
+      "threshold": 0.75
+    },
+    "list": {
+      "path": "ui/list.png",
+      "threshold": 0.6
+    },
+    "quit": {
+      "path": "ui/quit.png",
+      "threshold": 0.65
+    },
+    "reject": {
+      "path": "ui/reject.png",
+      "threshold": 0.6
+    },
+    "right_bracket": {
+      "path": "ui/right_bracket.png",
+      "threshold": 0.75
+    },
+    "secret_task": {
+      "path": "ui/secret_task.png",
+      "threshold": 0.75
+    },
+    "start": {
+      "path": "ui/start.png",
+      "threshold": 0.75
+    }
+  },
+  "discord": {
+    "bot_name": "Tina\ubd07",
+    "dig_notification": {
+      "content": "<:digEmote:1305924160949846106> **NEW DIG / \uc0c8\ub85c\uc6b4 \ubc1c\uad74**",
+      "embed_title": ":zap: Action Required / \uc870\uce58 \ud544\uc694",
+      "embed_value": ":flag_us: A new dig has been posted! Get digging!\n:flag_kr: \uc0c8\ub85c\uc6b4 \ubc1c\uad74\uc774 \uac8c\uc2dc\ub418\uc5c8\uc2b5\ub2c8\ub2e4! \ubc1c\uad74\uc744 \uc2dc\uc791\ud558\uc138\uc694!",
+      "embed_color": "0xFF0000"
     }
   }
 }
